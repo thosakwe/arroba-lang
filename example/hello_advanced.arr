@@ -1,4 +1,5 @@
-greet <- (name) => "Hello, ${name}!" -> print
+# Witness the magic of piping.
 
-name <- "world"
-name -> greet
+"world"
+    -> (name) => "Hello, ${name}!"
+    -> print

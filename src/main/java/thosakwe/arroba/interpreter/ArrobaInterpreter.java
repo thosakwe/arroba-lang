@@ -10,6 +10,11 @@ import thosakwe.arroba.interpreter.stdlib.PrintFunction;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * TODO: Both types of arrow expressions should be expressions,
+ * and use a common method(left, right). Allow for assignments.
+ * Will be cool.
+ */
 public class ArrobaInterpreter extends Scoped {
     public ArrobaInterpreter() {
         super();
@@ -108,11 +113,22 @@ public class ArrobaInterpreter extends Scoped {
         ArrobaParser.ExprContext left = ctx.expr(0);
         ArrobaParser.ExprContext right = ctx.expr(1);
 
-        if (left instanceof ArrobaParser.IdExprContext) {
-            value(left.getText(), resolveExpr(right), false);
-            //System.out.println("Set " + left.getText() + " to (" + value(left.getText()) + ")");
-        } else if (left instanceof ArrobaParser.LocalExprContext) {
+        if (left instanceof ArrobaParser.LocalExprContext) {
             value(((ArrobaParser.LocalExprContext) left).ID().getText(), resolveExpr(right), true);
+        } else {
+            ArrobaDatum target = resolveExpr(left);
+
+            if (target instanceof ArrobaFunction) {
+                // This is a call
+                createChildScope();
+                List<ArrobaDatum> args = new ArrayList<>();
+                args.add(resolveExpr(right));
+                ((ArrobaFunction) target).invoke(args);
+                exitLastScope();
+            } else if (left instanceof ArrobaParser.IdExprContext) {
+                value(left.getText(), resolveExpr(right), false);
+                //System.out.println("Set " + left.getText() + " to (" + value(left.getText()) + ")");
+            }
         }
 
         super.enterAssignStmt(ctx);
