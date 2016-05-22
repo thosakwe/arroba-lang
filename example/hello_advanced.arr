@@ -1,5 +1,5 @@
 # Witness the magic of piping.
 
-"world"
+"advanced world"
     -> (name) => "Hello, ${name}!"
     -> print

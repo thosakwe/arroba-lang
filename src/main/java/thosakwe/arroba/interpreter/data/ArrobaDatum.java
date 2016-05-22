@@ -2,10 +2,14 @@ package thosakwe.arroba.interpreter.data;
 
 import thosakwe.arroba.antlr.ArrobaParser;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ArrobaDatum {
     protected ArrobaParser.ExprContext source;
+    public Map<String, ArrobaDatum> members = new HashMap<>();
 
-    public ArrobaDatum() {
+    protected ArrobaDatum() {
 
     }
 

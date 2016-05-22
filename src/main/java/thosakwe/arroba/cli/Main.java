@@ -26,7 +26,8 @@ public class Main {
 
         if (ast != null) {
             ArrobaInterpreter interpreter = new ArrobaInterpreter();
-            ParseTreeWalker.DEFAULT.walk(interpreter, ast);
+            //ParseTreeWalker.DEFAULT.walk(interpreter, ast);
+            interpreter.visitCompilationUnit(ast);
         }
     }
 

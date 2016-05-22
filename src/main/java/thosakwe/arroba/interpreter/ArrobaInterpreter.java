@@ -22,16 +22,17 @@ public class ArrobaInterpreter extends Scoped {
         globalScope.symbols.put("for", new ForFunction());
     }
 
-    public ArrobaDatum resolveExpr(ArrobaParser.ExprContext expr) {
+
+    public ArrobaDatum visitExpr(ArrobaParser.ExprContext expr) {
         if (expr instanceof ArrobaParser.NestedExprContext) {
-            return resolveExpr(((ArrobaParser.NestedExprContext) expr).expr());
+            return visitExpr(((ArrobaParser.NestedExprContext) expr).expr());
         } else if (expr instanceof ArrobaParser.IdExprContext) {
             return value(expr.getText());
         } else if (expr instanceof ArrobaParser.ArrowRightExprContext) {
             ArrobaParser.ArrowRightExprContext ctx = (ArrobaParser.ArrowRightExprContext) expr;
             ArrobaParser.ExprContext rightExpr = ctx.expr(1);
-            ArrobaDatum left = resolveExpr(ctx.expr(0));
-            ArrobaDatum right = resolveExpr(rightExpr);
+            ArrobaDatum left = visitExpr(ctx.expr(0));
+            ArrobaDatum right = visitExpr(rightExpr);
 
             if (right instanceof ArrobaFunction) {
                 List<ArrobaDatum> args = new ArrayList<>();
@@ -56,7 +57,7 @@ public class ArrobaInterpreter extends Scoped {
         } else if (expr instanceof ArrobaParser.NumExprContext) {
             return new ArrobaNumber((ArrobaParser.NumExprContext) expr);
         } else if (expr instanceof ArrobaParser.InvocationExprContext) {
-            ArrobaDatum target = resolveExpr(((ArrobaParser.InvocationExprContext) expr).target);
+            ArrobaDatum target = visitExpr(((ArrobaParser.InvocationExprContext) expr).target);
             if (target instanceof ArrobaFunction) {
                 createChildScope();
                 List<ArrobaParser.ExprContext> exprs = ((ArrobaParser.InvocationExprContext) expr).expr();
@@ -64,12 +65,10 @@ public class ArrobaInterpreter extends Scoped {
                 exprs.remove(0);
 
                 for (ArrobaParser.ExprContext exprContext : exprs) {
-                    args.add(resolveExpr(exprContext));
+                    args.add(visitExpr(exprContext));
                 }
 
-                System.out.println("before invocationexpr");
                 ArrobaDatum result = ((ArrobaFunction) target).invoke(args);
-                System.out.println("after invocationexpr");
                 exitLastScope();
                 return result;
             } else {
@@ -83,8 +82,8 @@ public class ArrobaInterpreter extends Scoped {
     private ArrobaNumber resolveMathExpr(ArrobaParser.MathExprContext ctx) {
         ArrobaParser.ExprContext leftExpr = ctx.expr(0);
         ArrobaParser.ExprContext rightExpr = ctx.expr(1);
-        ArrobaDatum leftValue = resolveExpr(leftExpr);
-        ArrobaDatum rightValue = resolveExpr(rightExpr);
+        ArrobaDatum leftValue = visitExpr(leftExpr);
+        ArrobaDatum rightValue = visitExpr(rightExpr);
 
         ArrobaNumber left = (leftValue instanceof ArrobaNumber) ? (ArrobaNumber) leftValue : ArrobaNumber.Zero();
         ArrobaNumber right = (rightValue instanceof ArrobaNumber) ? (ArrobaNumber) rightValue : ArrobaNumber.Zero();
@@ -109,40 +108,42 @@ public class ArrobaInterpreter extends Scoped {
     }
 
     @Override
-    public void enterAssignStmt(ArrobaParser.AssignStmtContext ctx) {
+    public ArrobaDatum visitAssignStmt(ArrobaParser.AssignStmtContext ctx) {
         ArrobaParser.ExprContext left = ctx.expr(0);
         ArrobaParser.ExprContext right = ctx.expr(1);
+        ArrobaDatum result = null;
 
         if (left instanceof ArrobaParser.LocalExprContext) {
-            value(((ArrobaParser.LocalExprContext) left).ID().getText(), resolveExpr(right), true);
+            value(((ArrobaParser.LocalExprContext) left).ID().getText(), visitExpr(right), true);
         } else {
-            ArrobaDatum target = resolveExpr(left);
+            ArrobaDatum target = visitExpr(left);
 
             if (target instanceof ArrobaFunction) {
                 // This is a call
                 createChildScope();
                 List<ArrobaDatum> args = new ArrayList<>();
-                args.add(resolveExpr(right));
-                ((ArrobaFunction) target).invoke(args);
+                args.add(visitExpr(right));
+                result = ((ArrobaFunction) target).invoke(args);
                 exitLastScope();
             } else if (left instanceof ArrobaParser.IdExprContext) {
-                value(left.getText(), resolveExpr(right), false);
+                result = visitExpr(right);
+                value(left.getText(), result, false);
                 //System.out.println("Set " + left.getText() + " to (" + value(left.getText()) + ")");
             }
         }
 
-        super.enterAssignStmt(ctx);
+        return result;
     }
 
     @Override
-    public void enterExprStmt(ArrobaParser.ExprStmtContext ctx) {
-        resolveExpr(ctx.expr());
-        super.enterExprStmt(ctx);
+    public ArrobaDatum visitExprStmt(ArrobaParser.ExprStmtContext ctx) {
+        return visitExpr(ctx.expr());
     }
 
     @Override
-    public void enterFunctionExpr(ArrobaParser.FunctionExprContext ctx) {
+    public ArrobaDatum visitFunctionExpr(ArrobaParser.FunctionExprContext ctx) {
         System.out.println("Ok");
         //super.enterFunctionExpr(ctx);
+        return super.visitFunctionExpr(ctx);
     }
 }

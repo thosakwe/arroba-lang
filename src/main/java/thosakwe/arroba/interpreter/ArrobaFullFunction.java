@@ -1,7 +1,5 @@
 package thosakwe.arroba.interpreter;
 
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import thosakwe.arroba.antlr.ArrobaParser;
 import thosakwe.arroba.interpreter.data.ArrobaDatum;
@@ -32,9 +30,9 @@ class ArrobaFullFunction extends ArrobaFunction {
         // Manually execute each statement, until we reach a "ret"
         for (ArrobaParser.StmtContext stmt : source.stmt()) {
             if (stmt.retStmt() != null) {
-                result = interpreter.resolveExpr(stmt.retStmt().expr());
+                result = interpreter.visitExpr(stmt.retStmt().expr());
                 break;
-            } else interpreter.enterStmt(stmt);
+            } else interpreter.visitStmt(stmt);
         }
 
         // Destroy that last scope
@@ -80,7 +78,7 @@ class ArrobaInlineFunction extends ArrobaFunction {
             //System.out.println("Passing argument: " + targetSymbol + " = " + args.get(i));
         }
 
-        result = interpreter.resolveExpr(source.expr());
+        result = interpreter.visitExpr(source.expr());
 
         // Destroy that last scope
         interpreter.exitLastScope();

@@ -26,7 +26,7 @@ public class ArrobaString extends ArrobaDatum {
         while (matcher.find()) {
             ArrobaParser parser = AstGen.makeParserFromText(matcher.group(1));
             ArrobaParser.ExprContext expr = parser.compilationUnit().stmt(0).exprStmt().expr();
-            ArrobaDatum resolvedValue = interpreter.resolveExpr(expr);
+            ArrobaDatum resolvedValue = interpreter.visitExpr(expr);
             String resolved = resolvedValue == null ? "<undefined expression(" + matcher.group(1) + ")>" : resolvedValue.toString();
 
             if (resolvedValue instanceof ArrobaString) {

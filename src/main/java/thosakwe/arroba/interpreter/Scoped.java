@@ -1,6 +1,7 @@
 package thosakwe.arroba.interpreter;
 
 import thosakwe.arroba.antlr.ArrobaBaseListener;
+import thosakwe.arroba.antlr.ArrobaBaseVisitor;
 import thosakwe.arroba.interpreter.data.ArrobaDatum;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ class Scope {
     Map<String, ArrobaDatum> symbols = new HashMap<String, ArrobaDatum>();
 }
 
-class Scoped extends ArrobaBaseListener {
+class Scoped extends ArrobaBaseVisitor<ArrobaDatum> {
     Scope globalScope = new Scope();
     private List<Scope> scopes = new ArrayList<Scope>();
 
