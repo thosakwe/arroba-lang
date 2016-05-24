@@ -59,7 +59,7 @@ class ArrobaFile extends ArrobaDatum {
                     return "<Native Function> file.exists()";
                 }
             });
-            members.put("path", new ArrobaString(file.getPath(), null, null));
+            members.put("path", new ArrobaPureString(file.getPath()));
             members.put("read", new ArrobaFunction() {
                 @Override
                 public ArrobaDatum invoke(List<ArrobaDatum> args) {
