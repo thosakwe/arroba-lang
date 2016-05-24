@@ -16,6 +16,7 @@
 .idea/dataSources.local.xml
 .idea/sqlDataSources.xml
 .idea/dynamic.xml
+/src/main/java/thosakwe/arroba/antlr
 .idea/uiDesigner.xml
 
 # Gradle:

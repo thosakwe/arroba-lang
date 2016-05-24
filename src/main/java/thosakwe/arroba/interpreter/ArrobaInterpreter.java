@@ -114,6 +114,11 @@ public class ArrobaInterpreter extends Scoped {
         return null;
     }
 
+    @Override
+    public ArrobaDatum visitIfStmt(ArrobaParser.IfStmtContext ctx) {
+        return super.visitIfStmt(ctx);
+    }
+
     private ArrobaNumber resolveMathExpr(ArrobaParser.MathExprContext ctx) {
         ArrobaParser.ExprContext leftExpr = ctx.expr(0);
         ArrobaParser.ExprContext rightExpr = ctx.expr(1);

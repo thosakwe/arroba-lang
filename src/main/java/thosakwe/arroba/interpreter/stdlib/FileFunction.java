@@ -12,7 +12,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Scanner;
 
 public class FileFunction extends ArrobaFunction {
     @Override
@@ -34,9 +33,8 @@ public class FileFunction extends ArrobaFunction {
 
 class ArrobaFile extends ArrobaDatum {
     private File file;
-    private Scanner scanner;
 
-    static String readFile(String path, Charset encoding)
+    private static String readFile(String path, Charset encoding)
             throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);
@@ -45,7 +43,6 @@ class ArrobaFile extends ArrobaDatum {
     ArrobaFile(ArrobaString path) {
         try {
             file = new File(path.toString());
-            scanner = new Scanner(file);
 
             members.put("exists", new ArrobaFunction() {
                 @Override

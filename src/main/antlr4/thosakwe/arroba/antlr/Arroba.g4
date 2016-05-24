@@ -2,10 +2,15 @@ grammar Arroba;
 
 compilationUnit: stmt*;
 
-stmt: (assignStmt | exprStmt | retStmt) SEMI?;
+stmt: (assignStmt | exprStmt | ifStmt | retStmt) SEMI?;
 assignStmt: expr (ARR_L | EQUALS) expr;
 exprStmt: expr;
 retStmt: RET expr;
+
+ifStmt:  ifBlock elifBlock* elseBlock?;
+ifBlock: (IF PAREN_L expr PAREN_R stmt) | (IF PAREN_L expr PAREN_R CURLY_L stmt* CURLY_R);
+elifBlock: (ELSE IF PAREN_L expr PAREN_R stmt) | (ELSE IF PAREN_L expr PAREN_R CURLY_L stmt* CURLY_R);
+elseBlock: (ELSE stmt) | (ELSE CURLY_L stmt* CURLY_R);
 
 expr:
     ID #IdExpr
