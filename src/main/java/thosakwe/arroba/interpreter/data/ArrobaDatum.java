@@ -61,4 +61,8 @@ public class ArrobaDatum {
 
         return value;
     }
+
+    public Boolean toBool() {
+        return true;
+    }
 }

@@ -24,6 +24,7 @@ public class ArrobaInterpreter extends Scoped {
         globalScope.symbols.put("all", new AllFunction());
         globalScope.symbols.put("any", new AnyFunction());
         globalScope.symbols.put("File", new FileFunction());
+        globalScope.symbols.put("rgx", new RgxFunction());
 
         List<ArrobaDatum> arguments = new ArrayList<>();
 
@@ -70,6 +71,8 @@ public class ArrobaInterpreter extends Scoped {
             ArrobaParser.StringExprContext ctx = (ArrobaParser.StringExprContext) expr;
             String text = ctx.getText().replaceAll("(^\")|(\"$)", "");
             return new ArrobaString(text, ctx, this);
+        } else if (expr instanceof ArrobaParser.ConstBoolExprContext) {
+            return new ArrobaNumber(((ArrobaParser.ConstBoolExprContext) expr).FALSE() == null ? 1.0 : 0.0);
         } else if (expr instanceof ArrobaParser.FunctionExprContext) {
             return new ArrobaFullFunction((ArrobaParser.FunctionExprContext) expr, this);
         } else if (expr instanceof ArrobaParser.InlineFunctionExprContext) {

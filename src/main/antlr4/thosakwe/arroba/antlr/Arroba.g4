@@ -15,6 +15,7 @@ elseBlock: (ELSE stmt) | (ELSE CURLY_L stmt* CURLY_R);
 expr:
     ID #IdExpr
     | (INT | HEX | DBL) #NumExpr
+    | (TRUE | FALSE) #ConstBoolExpr
     | expr (PLUS | MINUS | TIMES | DIVIDE | MODULO | CARET) expr #MathExpr
     | STRING #StringExpr
     | expr DOT ID #MemberExpr
@@ -75,12 +76,15 @@ LTE: LT EQUALS | 'lte';
 GT: '>' | 'gt';
 GTE: GT EQUALS | 'gte';
 
+FALSE: 'false';
+TRUE: 'true';
+
 FN: 'fn';
 LOCAL: 'local';
 RET: 'ret';
 
 DBL: MINUS? [0-9]+ DOT [0-9]+;
-HEX: ('0x' [a-zA-Z0-9]+) | ([a-zA-Z0-9]+ 'h');
+HEX: '0x' [a-zA-Z0-9]+;
 INT: MINUS? [0-9]+;
 fragment ESCAPED: '\\"' | '\\r' | '\\n';
 STRING: '"' (ESCAPED | ~('\n'|'\r'))*? '"';

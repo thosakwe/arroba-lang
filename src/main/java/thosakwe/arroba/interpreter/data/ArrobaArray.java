@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 public class ArrobaArray extends ArrobaDatum {
     public List<ArrobaDatum> items = new ArrayList<>();
 
-    ArrobaArray() {
+    public ArrobaArray() {
         addMembers();
     }
 
-    ArrobaArray(ArrobaDatum single) {
+    public ArrobaArray(ArrobaDatum single) {
         items.add(single);
         addMembers();
     }
@@ -37,7 +37,7 @@ public class ArrobaArray extends ArrobaDatum {
         members.put("len", new ArrobaFunction() {
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {
-                return ArrobaNumber.From(items.size() * 1.0);
+                return new ArrobaNumber(new Integer(items.size()).doubleValue());
             }
 
             @Override

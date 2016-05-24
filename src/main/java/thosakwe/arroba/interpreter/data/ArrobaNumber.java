@@ -40,8 +40,7 @@ public class ArrobaNumber extends ArrobaDatum {
     }
 
     public ArrobaNumber(Double value) {
-        ArrobaNumber result = new ArrobaNumber();
-        result.value = value;
+        this.value = value;
         addStr();
     }
 
@@ -56,5 +55,10 @@ public class ArrobaNumber extends ArrobaDatum {
     @Override
     public String toString() {
         return value.toString();
+    }
+
+    @Override
+    public Boolean toBool() {
+        return value != 0.0;
     }
 }
