@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ArrobaArray extends ArrobaDatum {
-    private List<ArrobaDatum> items = new ArrayList<>();
+    public List<ArrobaDatum> items = new ArrayList<>();
 
     ArrobaArray() {
         addMembers();
@@ -21,17 +21,19 @@ public class ArrobaArray extends ArrobaDatum {
         addMembers();
     }
 
-    ArrobaArray(Collection<? extends ArrobaDatum> items) {
+    public ArrobaArray(Collection<? extends ArrobaDatum> items) {
         this.items.addAll(items);
         addMembers();
     }
 
-    ArrobaArray(List<ArrobaParser.ExprContext> items, ArrobaInterpreter interpreter) {
+    public ArrobaArray(List<ArrobaParser.ExprContext> items, ArrobaInterpreter interpreter) {
         this.items.addAll(items.stream().map(interpreter::visitExpr).collect(Collectors.toList()));
         addMembers();
     }
 
     private void addMembers() {
+        ArrobaArray parent = this;
+
         members.put("len", new ArrobaFunction() {
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {
@@ -43,5 +45,31 @@ public class ArrobaArray extends ArrobaDatum {
                 return "<Native Function> array.len";
             }
         });
+
+        members.put("str", new ArrobaFunction() {
+            @Override
+            public ArrobaDatum invoke(List<ArrobaDatum> args) {
+                return new ArrobaString("Array <" + parent.items.size() + ">", null, null);
+            }
+
+            @Override
+            public String toString() {
+                return "<Native Function> str()";
+            }
+        });
+    }
+
+    public ArrobaDatum resolveIndex(ArrobaDatum index) {
+        if (index instanceof ArrobaNumber) {
+            return items.get(((ArrobaNumber) index).value.intValue());
+        }
+
+        System.err.println("Given indexer is not a number: " + index.toString());
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return "Array <" + items.size() + ">";
     }
 }

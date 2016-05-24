@@ -1,12 +1,29 @@
 package thosakwe.arroba.interpreter.data;
 
 import thosakwe.arroba.antlr.ArrobaParser;
+import thosakwe.arroba.interpreter.ArrobaFunction;
+
+import java.util.List;
 
 public class ArrobaNumber extends ArrobaDatum {
     public Double value = 0.0;
 
     private ArrobaNumber() {
+        addStr();
+    }
 
+    private void addStr() {
+        members.put("str", new ArrobaFunction() {
+            @Override
+            public ArrobaDatum invoke(List<ArrobaDatum> args) {
+                return new ArrobaString(value.toString(), null, null);
+            }
+
+            @Override
+            public String toString() {
+                return "<Native Function> str()";
+            }
+        });
     }
 
     public ArrobaNumber(ArrobaParser.NumExprContext ctx) {
@@ -18,12 +35,18 @@ public class ArrobaNumber extends ArrobaDatum {
             String hexString = ctx.HEX().getText().replaceAll("(^0x)|((H|h)$)", "");
             value = Integer.parseInt(hexString, 16) * 1.0;
         }
+
+        addStr();
+    }
+
+    public ArrobaNumber(Double value) {
+        ArrobaNumber result = new ArrobaNumber();
+        result.value = value;
+        addStr();
     }
 
     public static ArrobaNumber From(Double value) {
-        ArrobaNumber result = new ArrobaNumber();
-        result.value = value;
-        return result;
+        return new ArrobaNumber(value);
     }
 
     public static ArrobaNumber Zero() {

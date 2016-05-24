@@ -1,14 +1,12 @@
 package thosakwe.arroba.interpreter;
 
 import thosakwe.arroba.antlr.ArrobaParser;
-import thosakwe.arroba.interpreter.data.ArrobaDatum;
-import thosakwe.arroba.interpreter.data.ArrobaNumber;
-import thosakwe.arroba.interpreter.data.ArrobaString;
-import thosakwe.arroba.interpreter.stdlib.ForFunction;
-import thosakwe.arroba.interpreter.stdlib.PrintFunction;
+import thosakwe.arroba.interpreter.data.*;
+import thosakwe.arroba.interpreter.stdlib.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /*
  * TODO: Both types of arrow expressions should be expressions,
@@ -16,10 +14,25 @@ import java.util.List;
  * Will be cool.
  */
 public class ArrobaInterpreter extends Scoped {
-    public ArrobaInterpreter() {
+    public Scanner scanner = new Scanner(System.in);
+
+    public ArrobaInterpreter(String[] args) {
         super();
         globalScope.symbols.put("print", new PrintFunction());
+        globalScope.symbols.put("input", new InputFunction(this));
         globalScope.symbols.put("for", new ForFunction());
+        globalScope.symbols.put("all", new AllFunction());
+        globalScope.symbols.put("any", new AnyFunction());
+        globalScope.symbols.put("File", new FileFunction());
+
+        List<ArrobaDatum> arguments = new ArrayList<>();
+
+        for (String arg : args) {
+            arguments.add(new ArrobaPureString(arg));
+        }
+
+        globalScope.symbols.put("argc", new ArrobaNumber(args.length * 1.0));
+        globalScope.symbols.put("argv", new ArrobaArray(arguments));
     }
 
 
@@ -44,6 +57,15 @@ public class ArrobaInterpreter extends Scoped {
             } else if (rightExpr instanceof ArrobaParser.LocalExprContext) {
                 return value(((ArrobaParser.LocalExprContext) rightExpr).ID().getText(), left, true);
             }
+        } else if (expr instanceof ArrobaParser.MemberExprContext) {
+            ArrobaParser.MemberExprContext ctx = (ArrobaParser.MemberExprContext) expr;
+            ArrobaDatum parent = visitExpr(ctx.expr());
+
+            if (parent != null) {
+                return parent.resolve(ctx.ID().getText());
+            } else {
+                System.err.println("Invalid expression: " + ctx.expr().getText());
+            }
         } else if (expr instanceof ArrobaParser.StringExprContext) {
             ArrobaParser.StringExprContext ctx = (ArrobaParser.StringExprContext) expr;
             String text = ctx.getText().replaceAll("(^\")|(\"$)", "");
@@ -56,6 +78,19 @@ public class ArrobaInterpreter extends Scoped {
             return resolveMathExpr((ArrobaParser.MathExprContext) expr);
         } else if (expr instanceof ArrobaParser.NumExprContext) {
             return new ArrobaNumber((ArrobaParser.NumExprContext) expr);
+        } else if (expr instanceof ArrobaParser.ArrayExprContext) {
+            return new ArrobaArray(((ArrobaParser.ArrayExprContext) expr).expr(), this);
+        } else if (expr instanceof ArrobaParser.IndexExprContext) {
+            ArrobaParser.IndexExprContext ctx = (ArrobaParser.IndexExprContext) expr;
+            ArrobaDatum target = visitExpr(ctx.target);
+
+            if (target instanceof ArrobaArray) {
+                ArrobaDatum index = visitExpr(ctx.index);
+                return ((ArrobaArray) target).resolveIndex(index);
+            } else {
+                System.err.println("Given expression is not an array: " + ctx.target.getText());
+                return null;
+            }
         } else if (expr instanceof ArrobaParser.InvocationExprContext) {
             ArrobaDatum target = visitExpr(((ArrobaParser.InvocationExprContext) expr).target);
             if (target instanceof ArrobaFunction) {
@@ -115,6 +150,15 @@ public class ArrobaInterpreter extends Scoped {
 
         if (left instanceof ArrobaParser.LocalExprContext) {
             value(((ArrobaParser.LocalExprContext) left).ID().getText(), visitExpr(right), true);
+        } else if (left instanceof ArrobaParser.MemberExprContext) {
+            ArrobaParser.MemberExprContext expr = (ArrobaParser.MemberExprContext) left;
+            ArrobaDatum target = visitExpr(expr.expr());
+
+            if (target != null) {
+                target.setMember(expr.ID().getText(), visitExpr(right));
+            } else {
+                System.err.println("Invalid expression: " + expr.getText());
+            }
         } else {
             ArrobaDatum target = visitExpr(left);
 

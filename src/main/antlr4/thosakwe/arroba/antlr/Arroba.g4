@@ -2,8 +2,8 @@ grammar Arroba;
 
 compilationUnit: stmt*;
 
-stmt: assignStmt | exprStmt | retStmt;
-assignStmt: expr ARR_L expr;
+stmt: (assignStmt | exprStmt | retStmt) SEMI?;
+assignStmt: expr (ARR_L | EQUALS) expr;
 exprStmt: expr;
 retStmt: RET expr;
 
@@ -13,7 +13,8 @@ expr:
     | expr (PLUS | MINUS | TIMES | DIVIDE | MODULO | CARET) expr #MathExpr
     | STRING #StringExpr
     | expr DOT ID #MemberExpr
-    | SQUARE_L (expr COMMA)* expr SQUARE_R #VectorExpr
+    | target=expr SQUARE_L index=expr SQUARE_R #IndexExpr
+    | SQUARE_L (expr COMMA)* expr SQUARE_R #ArrayExpr
     | LOCAL COLON ID #LocalExpr
     | expr ARR_R expr #ArrowRightExpr
     | FN paramSpec CURLY_L stmt* CURLY_R #FunctionExpr

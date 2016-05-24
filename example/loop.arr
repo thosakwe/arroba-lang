@@ -9,3 +9,7 @@ looper <- fn() {
 }
 
 looper -> runThrice
+
+# All loop
+
+["hello", "world"] -> (all(print))
