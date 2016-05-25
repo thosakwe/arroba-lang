@@ -20,12 +20,7 @@ class ArrobaFullFunction extends ArrobaFunction {
         ArrobaDatum result = null;
         interpreter.createChildScope();
 
-        // Load arguments into a new scope
-        for (int i = 0; i < source.paramSpec().ID().size() && i < args.size(); i++) {
-            String targetSymbol = source.paramSpec().ID(i).getText();
-            interpreter.value(targetSymbol, args.get(i), false);
-            //System.out.println("Passing argument: " + targetSymbol + " = " + args.get(i));
-        }
+        loadParams(args, source.paramSpec(), interpreter);
 
         // Manually execute each statement, until we reach a "ret"
         for (ArrobaParser.StmtContext stmt : source.stmt()) {
@@ -68,17 +63,11 @@ class ArrobaInlineFunction extends ArrobaFunction {
 
     @Override
     public ArrobaDatum invoke(List<ArrobaDatum> args) {
-        ArrobaDatum result = null;
         interpreter.createChildScope();
 
-        // Load arguments into a new scope
-        for (int i = 0; i < source.paramSpec().ID().size() && i < args.size(); i++) {
-            String targetSymbol = source.paramSpec().ID(i).getText();
-            interpreter.value(targetSymbol, args.get(i), false);
-            //System.out.println("Passing argument: " + targetSymbol + " = " + args.get(i));
-        }
+        loadParams(args, source.paramSpec(), interpreter);
 
-        result = interpreter.visitExpr(source.expr());
+        ArrobaDatum result = interpreter.visitExpr(source.expr());
 
         // Destroy that last scope
         interpreter.exitLastScope();

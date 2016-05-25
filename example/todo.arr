@@ -13,6 +13,8 @@ todos <- [
 
 "The following is left to be done (${todos.len()} items):" -> print
 
-todos -> (all((x) => "    * ${x}" -> print))
+todos.all(fn(x) {
+    print("    * ${x}")
+})
 
 # The to-do list for Arroba is written in Arroba... Sweet...

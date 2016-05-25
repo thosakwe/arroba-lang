@@ -1,2 +1,2 @@
 @echo off
-SET PATH="%PATH;%~dp0arroba.sh"
+SET PATH=%~dp0bin;%PATH%

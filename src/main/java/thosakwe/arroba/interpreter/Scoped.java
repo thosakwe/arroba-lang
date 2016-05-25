@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Map;
 
 class Scope {
-    public Boolean dead = false;
+    Boolean dead = false;
     Map<String, ArrobaDatum> symbols = new HashMap<String, ArrobaDatum>();
 }
 
 class Scoped extends ArrobaBaseVisitor<ArrobaDatum> {
     Scope globalScope = new Scope();
-    private List<Scope> scopes = new ArrayList<Scope>();
+    public List<Scope> scopes = new ArrayList<Scope>();
 
     Scoped() {
         scopes.add(globalScope);
@@ -25,6 +25,16 @@ class Scoped extends ArrobaBaseVisitor<ArrobaDatum> {
     Scope createChildScope() {
         scopes.add(new Scope());
         return scopes.get(scopes.size() - 1);
+    }
+
+    public void dumpScopes() {
+        for (int i = scopes.size() - 1; i >= 0; i--) {
+            Scope scope = scopes.get(i);
+            System.out.println("All symbols in scope " + (i + 1) + ":");
+            for (String key : scope.symbols.keySet()) {
+                System.out.println("\t" + key + ": " + scope.symbols.get(key).toString());
+            }
+        }
     }
 
     void exitLastScope() {
@@ -66,14 +76,7 @@ class Scoped extends ArrobaBaseVisitor<ArrobaDatum> {
         //System.out.println("Resolving: " + symbol);
         // Search scopes from bottom to top
 
-
-        /*for (int i = scopes.size() - 1; i >= 0; i--) {
-            Scope scope = scopes.get(i);
-            System.out.println("All symbols in scope " + (i + 1) + ":");
-            for (String key : scope.symbols.keySet()) {
-                System.out.println("\t" + key + ": " + scope.symbols.get(key).toString());
-            }
-        }*/
+        //dumpScopes();
 
         for (int i = scopes.size() - 1; i >= 0; i--) {
             Scope scope = scopes.get(i);

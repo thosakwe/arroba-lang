@@ -29,9 +29,10 @@ public class ArrobaDatum {
             } else return resolved;
         }
 
-        for (String symbol : members.keySet()) {
+        /*for (String symbol : members.keySet()) {
             System.out.println("Symbol: " + symbol);
-        }
+        }*/
+
         System.err.println("Could not resolve member: " + memberName);
         return null;
     }

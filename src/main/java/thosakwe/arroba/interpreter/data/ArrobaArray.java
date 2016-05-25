@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class ArrobaArray extends ArrobaDatum {
     public List<ArrobaDatum> items = new ArrayList<>();
 
-    public ArrobaArray() {
+    protected ArrobaArray() {
         addMembers();
     }
 
@@ -33,6 +33,34 @@ public class ArrobaArray extends ArrobaDatum {
 
     private void addMembers() {
         ArrobaArray parent = this;
+
+        members.put("all", new ArrobaFunction() {
+            @Override
+            public ArrobaDatum invoke(List<ArrobaDatum> args) {
+                ArrobaDatum target = args.get(0);
+
+                if (target != null && target instanceof ArrobaFunction) {
+                    List<ArrobaDatum> results = new ArrayList<>();
+                    ArrobaFunction targetFn = ((ArrobaFunction) target);
+
+                    for (ArrobaDatum item : items) {
+                        ArrobaDatum result = targetFn.invoke(item);
+                        //System.out.println(item + " -> " + result);
+                        results.add(result);
+                    }
+
+                    return new ArrobaArray(results);
+                }
+
+                System.err.println("array.all expects argument 1 to be a function");
+                return null;
+            }
+
+            @Override
+            public String toString() {
+                return "<Native Function> array.all(fn)";
+            }
+        });
 
         members.put("len", new ArrobaFunction() {
             @Override

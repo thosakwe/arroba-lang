@@ -25,6 +25,7 @@ public class ArrobaInterpreter extends Scoped {
         globalScope.symbols.put("any", new AnyFunction());
         globalScope.symbols.put("File", new FileFunction());
         globalScope.symbols.put("rgx", new RgxFunction());
+        globalScope.symbols.put("cat", new CatFunction());
 
         List<ArrobaDatum> arguments = new ArrayList<>();
 
@@ -170,14 +171,15 @@ public class ArrobaInterpreter extends Scoped {
         } else {
             ArrobaDatum target = visitExpr(left);
 
-            if (target instanceof ArrobaFunction) {
+            /*if (target instanceof ArrobaFunction) {
                 // This is a call
                 createChildScope();
                 List<ArrobaDatum> args = new ArrayList<>();
                 args.add(visitExpr(right));
                 result = ((ArrobaFunction) target).invoke(args);
                 exitLastScope();
-            } else if (left instanceof ArrobaParser.IdExprContext) {
+            } else*/
+            if (left instanceof ArrobaParser.IdExprContext) {
                 result = visitExpr(right);
                 value(left.getText(), result, false);
                 //System.out.println("Set " + left.getText() + " to (" + value(left.getText()) + ")");

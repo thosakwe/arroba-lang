@@ -15,7 +15,7 @@ public class PrintFunction extends ArrobaFunction {
             System.out.println(arg == null ? "<null>" : arg.toString());
         }
 
-        return null;
+        return args.isEmpty() ? null : args.get(0);
     }
 
     @Override

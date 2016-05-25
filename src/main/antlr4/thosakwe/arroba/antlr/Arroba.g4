@@ -20,12 +20,12 @@ expr:
     | STRING #StringExpr
     | expr DOT ID #MemberExpr
     | target=expr SQUARE_L index=expr SQUARE_R #IndexExpr
-    | SQUARE_L (expr COMMA)* expr SQUARE_R #ArrayExpr
+    | SQUARE_L ((expr COMMA)* expr)? SQUARE_R #ArrayExpr
     | LOCAL COLON ID #LocalExpr
-    | expr ARR_R expr #ArrowRightExpr
     | FN paramSpec CURLY_L stmt* CURLY_R #FunctionExpr
     | paramSpec ARR_FAT expr #InlineFunctionExpr
     | target=expr PAREN_L ((expr COMMA)* expr)? PAREN_R #InvocationExpr
+    | expr ARR_R expr #ArrowRightExpr
     | PAREN_L expr PAREN_R #NestedExpr
 ;
 
