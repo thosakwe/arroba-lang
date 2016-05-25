@@ -14,7 +14,7 @@ public class ArrobaString extends ArrobaDatum {
     String text;
 
     private void addLen() {
-
+        addEquals();
         members.put("len", new ArrobaFunction() {
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {

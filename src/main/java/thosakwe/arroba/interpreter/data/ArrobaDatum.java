@@ -8,14 +8,16 @@ import java.util.List;
 import java.util.Map;
 
 public class ArrobaDatum {
-    protected ArrobaParser.ExprContext source;
-    public Map<String, ArrobaDatum> members = new HashMap<>();
+    private ArrobaParser.ExprContext source;
+    protected Map<String, ArrobaDatum> members = new HashMap<>();
 
     public ArrobaDatum() {
+        addEquals();
     }
 
     public ArrobaDatum(ArrobaParser.ExprContext source) {
         this.source = source;
+        addEquals();
     }
 
     public ArrobaDatum resolve(String memberName) {
@@ -65,5 +67,25 @@ public class ArrobaDatum {
 
     public Boolean toBool() {
         return true;
+    }
+
+    protected void addEquals() {
+        ArrobaDatum parent = this;
+
+        /*members.put("equals", new ArrobaFunction() {
+            @Override
+            public ArrobaDatum invoke(List<ArrobaDatum> args) {
+                return args.isEmpty() ? ArrobaNumber.Zero() : new ArrobaNumber(parent.equalsDatum(args.get(0)) ? 1.0 : 0.0);
+            }
+
+            @Override
+            public String toString() {
+                return "<Native Function> obj.equals(other)";
+            }
+        });*/
+    }
+
+    public Boolean equalsDatum(ArrobaDatum other) {
+        return false;
     }
 }

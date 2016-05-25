@@ -4,8 +4,15 @@ arr <- [1, 2, 3, "ok"]
 # Length
 arr.len() -> print
 
-# Loop it
-arr -> (all((x) => "Array contains: ${x}" -> print))
+# Loop it via arr.all()
+arr.all(print)
+
+# arr.all() actually functions like 'map' in JavaScript.
+
+[1, 2, 3]
+    .all((x) => x + 400)
+    .all(cat("..."))
+    .all(print)
 
 # Index it!
 
@@ -15,4 +22,5 @@ looper <- fn() {
     i <- i + 1
 }
 
-looper -> (for(arr.len()))
+looper -> for(arr.len())
+

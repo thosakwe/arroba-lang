@@ -40,7 +40,7 @@ public class RgxFunction extends ArrobaFunction {
 
 class ArrobaMatcher extends ArrobaFunction {
     private Pattern pattern;
-    public Boolean multiple;
+    Boolean multiple;
 
     ArrobaMatcher(Pattern pattern) {
         this.pattern = pattern;

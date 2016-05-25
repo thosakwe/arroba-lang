@@ -1,4 +1,4 @@
-todos <- [
+todos = [
     "Maybe ints",
     "Fix regex speeds",
     "More tests",

@@ -8,10 +8,12 @@ import java.util.List;
 
 public class ArrobaFunction extends ArrobaDatum {
     protected ArrobaFunction() {
+        addEquals();
     }
 
     ArrobaFunction(ArrobaParser.ExprContext source) {
         super(source);
+        addEquals();
     }
 
     public ArrobaDatum invoke(ArrobaDatum arg) {
@@ -30,10 +32,10 @@ public class ArrobaFunction extends ArrobaDatum {
             String targetSymbol = paramSpec.ID(i).getText();
             interpreter.value(targetSymbol, args.get(i), true);
 
-            System.out.println("Passing argument: " + targetSymbol + " = " + args.get(i));
+            /*System.out.println("Passing argument: " + targetSymbol + " = " + args.get(i));
             System.out.println(targetSymbol + " now resides in scope " + (interpreter.scopes.size() - 1) + ".");
             System.out.println("There are " + interpreter.scopes.size() + " total scopes.");
-            interpreter.dumpScopes();
+            interpreter.dumpScopes();*/
         }
     }
 }

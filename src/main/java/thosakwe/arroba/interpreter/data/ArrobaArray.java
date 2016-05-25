@@ -33,7 +33,7 @@ public class ArrobaArray extends ArrobaDatum {
 
     private void addMembers() {
         ArrobaArray parent = this;
-
+        addEquals();
         members.put("all", new ArrobaFunction() {
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {

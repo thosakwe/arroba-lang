@@ -13,6 +13,7 @@ public class ArrobaNumber extends ArrobaDatum {
     }
 
     private void addStr() {
+        addEquals();
         members.put("str", new ArrobaFunction() {
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {
@@ -60,5 +61,14 @@ public class ArrobaNumber extends ArrobaDatum {
     @Override
     public Boolean toBool() {
         return value != 0.0;
+    }
+
+    @Override
+    public Boolean equalsDatum(ArrobaDatum other) {
+        if (other instanceof ArrobaNumber) {
+            return ((ArrobaNumber) other).value.equals(value);
+        }
+
+        return super.equalsDatum(other);
     }
 }

@@ -16,6 +16,7 @@ expr:
     ID #IdExpr
     | (INT | HEX | DBL) #NumExpr
     | (TRUE | FALSE) #ConstBoolExpr
+    | left=expr booleanOperator right=expr #BoolExpr
     | expr (PLUS | MINUS | TIMES | DIVIDE | MODULO | CARET) expr #MathExpr
     | STRING #StringExpr
     | expr DOT ID #MemberExpr
@@ -75,6 +76,7 @@ LT: '<' | 'lt';
 LTE: LT EQUALS | 'lte';
 GT: '>' | 'gt';
 GTE: GT EQUALS | 'gte';
+booleanOperator: IS | NOT | AND | OR | LT | LTE | GT | GTE;
 
 FALSE: 'false';
 TRUE: 'true';
