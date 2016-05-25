@@ -127,8 +127,7 @@ public class ArrobaInterpreter extends Scoped {
         if (ifIsTrue != null) {
             if (ifIsTrue.toBool()) {
                 return visitIfBlock(ctx.ifBlock());
-            }
-            if (!ctx.elifBlock().isEmpty()) {
+            } else if (!ctx.elifBlock().isEmpty()) {
                 for (ArrobaParser.ElifBlockContext eli : ctx.elifBlock()) {
                     ArrobaDatum condition = visitExpr(eli.expr());
 
@@ -139,9 +138,8 @@ public class ArrobaInterpreter extends Scoped {
                     }
                 }
             } else if (ctx.elseBlock() != null) {
-                visitElseBlock(ctx.elseBlock());
+                return visitElseBlock(ctx.elseBlock());
             }
-            return null;
         }
 
         return super.visitIfStmt(ctx);
@@ -258,9 +256,34 @@ public class ArrobaInterpreter extends Scoped {
     }
 
     @Override
+    public ArrobaDatum visitCompilationUnit(ArrobaParser.CompilationUnitContext ctx) {
+        ArrobaDatum result = null;
+
+        for (ArrobaParser.StmtContext stmt : ctx.stmt()) {
+            result = visitStmt(stmt);
+
+            if (stmt.retStmt() != null)
+                break;
+        }
+
+        return result;
+    }
+
+    @Override
     public ArrobaDatum visitExprStmt(ArrobaParser.ExprStmtContext ctx) {
         return visitExpr(ctx.expr());
     }
 
+    @Override
+    public ArrobaDatum visitStmt(ArrobaParser.StmtContext ctx) {
+        if (ctx.ifStmt() != null) {
+            return visitIfStmt(ctx.ifStmt());
+        } else if (ctx.exprStmt() != null) {
+            return visitExprStmt(ctx.exprStmt());
+        } else if (ctx.retStmt() != null) {
+            return visitExpr(ctx.retStmt().expr());
+        }
 
+        return super.visitStmt(ctx);
+    }
 }

@@ -24,10 +24,10 @@ class ArrobaFullFunction extends ArrobaFunction {
 
         // Manually execute each statement, until we reach a "ret"
         for (ArrobaParser.StmtContext stmt : source.stmt()) {
+            result = interpreter.visitStmt(stmt);
             if (stmt.retStmt() != null) {
-                result = interpreter.visitExpr(stmt.retStmt().expr());
                 break;
-            } else interpreter.visitStmt(stmt);
+            }
         }
 
         // Destroy that last scope

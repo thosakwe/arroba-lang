@@ -1,6 +1,5 @@
 package thosakwe.arroba.interpreter.stdlib;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import thosakwe.arroba.interpreter.ArrobaFunction;
 import thosakwe.arroba.interpreter.data.*;
 
