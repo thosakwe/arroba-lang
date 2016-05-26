@@ -4,28 +4,52 @@ import thosakwe.arroba.antlr.ArrobaParser;
 import thosakwe.arroba.interpreter.data.*;
 import thosakwe.arroba.interpreter.stdlib.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/*
- * TODO: Both types of arrow expressions should be expressions,
- * and use a common method(left, right). Allow for assignments.
- * Will be cool.
- */
 public class ArrobaInterpreter extends Scoped {
     public Scanner scanner = new Scanner(System.in);
 
     public ArrobaInterpreter(String[] args) {
         super();
+        try {
+            globalScope.symbols.put("import", new ImportFunction(this));
+        } catch (IOException e) {
+            System.err.println("Could not find include dir. Standard imports will not work.");
+        }
+        globalScope.symbols.put("eval", new EvalFunction(this));
         globalScope.symbols.put("print", new PrintFunction());
+        globalScope.symbols.put("printErr", new PrintErrFunction());
         globalScope.symbols.put("input", new InputFunction(this));
         globalScope.symbols.put("for", new ForFunction());
         globalScope.symbols.put("all", new AllFunction());
         globalScope.symbols.put("any", new AnyFunction());
         globalScope.symbols.put("File", new FileFunction());
+        globalScope.symbols.put("Directory", new DirectoryFunction());
+        globalScope.symbols.put("Socket", new DirectoryFunction());
+        globalScope.symbols.put("Task", new TaskFunction());
         globalScope.symbols.put("rgx", new RgxFunction());
         globalScope.symbols.put("cat", new CatFunction());
+        globalScope.symbols.put("quit", new ArrobaFunction() {
+            @Override
+            public ArrobaDatum invoke(List<ArrobaDatum> args) {
+                if (!args.isEmpty()) {
+                    ArrobaDatum status = args.get(0);
+                    ArrobaNumber result = (status instanceof ArrobaNumber) ? (ArrobaNumber) status : ArrobaNumber.False();
+                    System.exit(result.value.intValue());
+                    return null;
+                }
+                System.exit(0);
+                return null;
+            }
+
+            @Override
+            public String toString() {
+                return "<Native Function> quit()";
+            }
+        });
 
         List<ArrobaDatum> arguments = new ArrayList<>();
 
@@ -76,6 +100,11 @@ public class ArrobaInterpreter extends Scoped {
             return new ArrobaNumber(((ArrobaParser.ConstBoolExprContext) expr).FALSE() == null ? 1.0 : 0.0);
         } else if (expr instanceof ArrobaParser.BoolExprContext) {
             return visitBoolExpr((ArrobaParser.BoolExprContext) expr);
+        } else if (expr instanceof ArrobaParser.NegationExprContext) {
+            ArrobaDatum resolved = visitExpr(((ArrobaParser.NegationExprContext) expr).expr());
+            Boolean truth = (resolved == null) ? false : resolved.toBool();
+
+            return new ArrobaNumber(truth ? 1.0 : 0.0);
         } else if (expr instanceof ArrobaParser.FunctionExprContext) {
             return new ArrobaFullFunction((ArrobaParser.FunctionExprContext) expr, this);
         } else if (expr instanceof ArrobaParser.InlineFunctionExprContext) {
@@ -86,6 +115,22 @@ public class ArrobaInterpreter extends Scoped {
             return new ArrobaNumber((ArrobaParser.NumExprContext) expr);
         } else if (expr instanceof ArrobaParser.ArrayExprContext) {
             return new ArrobaArray(((ArrobaParser.ArrayExprContext) expr).expr(), this);
+        } else if (expr instanceof ArrobaParser.AwaitExprContext) {
+            List<ArrobaParser.ExprContext> exprs = ((ArrobaParser.AwaitExprContext) expr).expr();
+            ArrobaDatum target = visitExpr(((ArrobaParser.AwaitExprContext) expr).target);
+
+            if (target instanceof ArrobaTask) {
+                List<ArrobaDatum> args = new ArrayList<>();
+
+                for (int i = 1; i < exprs.size(); i++) {
+                    args.add(visitExpr(exprs.get(i)));
+                }
+
+                return ((ArrobaTask) target).yield().invoke(args);
+            }
+
+            System.err.println("You can only await tasks.");
+            return null;
         } else if (expr instanceof ArrobaParser.IndexExprContext) {
             ArrobaParser.IndexExprContext ctx = (ArrobaParser.IndexExprContext) expr;
             ArrobaDatum target = visitExpr(ctx.target);
@@ -124,45 +169,71 @@ public class ArrobaInterpreter extends Scoped {
     public ArrobaDatum visitIfStmt(ArrobaParser.IfStmtContext ctx) {
         ArrobaDatum ifIsTrue = visitExpr(ctx.ifBlock().expr());
 
+        ArrobaDatum result = null;
         if (ifIsTrue != null) {
             if (ifIsTrue.toBool()) {
-                return visitIfBlock(ctx.ifBlock());
+                for (ArrobaParser.StmtContext stmt : ctx.ifBlock().stmt()) {
+                    result = visitStmt(stmt);
+                    if (stmt.retStmt() != null)
+                        break;
+                }
             } else if (!ctx.elifBlock().isEmpty()) {
                 for (ArrobaParser.ElifBlockContext eli : ctx.elifBlock()) {
                     ArrobaDatum condition = visitExpr(eli.expr());
 
                     if (condition != null) {
                         if (condition.toBool()) {
-                            return visitElifBlock(eli);
+                            for (ArrobaParser.StmtContext stmt : eli.stmt()) {
+                                result = visitStmt(stmt);
+                                if (stmt.retStmt() != null)
+                                    break;
+                            }
                         }
                     }
                 }
             } else if (ctx.elseBlock() != null) {
-                return visitElseBlock(ctx.elseBlock());
+                for (ArrobaParser.StmtContext stmt : ctx.elseBlock().stmt()) {
+                    result = visitStmt(stmt);
+                    if (stmt.retStmt() != null)
+                        break;
+                }
             }
         }
 
-        return super.visitIfStmt(ctx);
+        return result;
 
     }
 
-    private ArrobaNumber resolveMathExpr(ArrobaParser.MathExprContext ctx) {
+    private ArrobaDatum resolveMathExpr(ArrobaParser.MathExprContext ctx) {
         ArrobaParser.ExprContext leftExpr = ctx.expr(0);
         ArrobaParser.ExprContext rightExpr = ctx.expr(1);
         ArrobaDatum leftValue = visitExpr(leftExpr);
         ArrobaDatum rightValue = visitExpr(rightExpr);
 
-        ArrobaNumber left = (leftValue instanceof ArrobaNumber) ? (ArrobaNumber) leftValue : ArrobaNumber.Zero();
-        ArrobaNumber right = (rightValue instanceof ArrobaNumber) ? (ArrobaNumber) rightValue : ArrobaNumber.Zero();
+        ArrobaNumber left = (leftValue instanceof ArrobaNumber) ? (ArrobaNumber) leftValue : ArrobaNumber.False();
+        ArrobaNumber right = (rightValue instanceof ArrobaNumber) ? (ArrobaNumber) rightValue : ArrobaNumber.False();
 
         /*System.out.println("left: " + left);
         System.out.println("right: " + right);*/
 
-        if (ctx.PLUS() != null)
+        if (ctx.PLUS() != null) {
+
+            if (leftValue instanceof ArrobaArray) {
+                ((ArrobaArray) leftValue).items.add(rightValue);
+                return leftValue;
+            } else if (leftValue instanceof ArrobaString) {
+                return new ArrobaPureString(leftValue.toString() + rightValue.toString());
+            }
+
             return ArrobaNumber.From(left.value + right.value);
-        else if (ctx.MINUS() != null)
+        } else if (ctx.MINUS() != null) {
+            if (leftValue instanceof ArrobaArray) {
+                ((ArrobaArray) leftValue).items.remove(rightValue);
+                return leftValue;
+            }
+
             return ArrobaNumber.From(left.value - right.value);
-        else if (ctx.TIMES() != null)
+        } else if (ctx.TIMES() != null)
             return ArrobaNumber.From(left.value * right.value);
         else if (ctx.DIVIDE() != null)
             return ArrobaNumber.From(left.value / right.value);
@@ -181,7 +252,8 @@ public class ArrobaInterpreter extends Scoped {
         ArrobaDatum result = null;
 
         if (left instanceof ArrobaParser.LocalExprContext) {
-            value(((ArrobaParser.LocalExprContext) left).ID().getText(), visitExpr(right), true);
+            result = visitExpr(right);
+            return value(((ArrobaParser.LocalExprContext) left).ID().getText(), result, true);
         } else if (left instanceof ArrobaParser.MemberExprContext) {
             ArrobaParser.MemberExprContext expr = (ArrobaParser.MemberExprContext) left;
             ArrobaDatum target = visitExpr(expr.expr());
@@ -215,26 +287,22 @@ public class ArrobaInterpreter extends Scoped {
     @Override
     public ArrobaDatum visitBoolExpr(ArrobaParser.BoolExprContext ctx) {
         ArrobaDatum leftExpr = visitExpr(ctx.left);
+        leftExpr = (leftExpr == null) ? ArrobaNumber.False() : leftExpr;
         ArrobaDatum rightExpr = visitExpr(ctx.right);
+        rightExpr = (rightExpr == null) ? ArrobaNumber.False() : rightExpr;
         Boolean result = false;
         ArrobaParser.BooleanOperatorContext operator = ctx.booleanOperator();
 
         if (operator.IS() != null || operator.NOT() != null) {
-            ArrobaDatum equals = leftExpr.resolve("equals");
-
-            if (equals != null && equals instanceof ArrobaFunction) {
-                ArrobaDatum equality = ((ArrobaFunction) equals).invoke(rightExpr);
-                if (equality != null) {
-                    if (operator.IS() != null) {
-                        result = equality.toBool();
-                    } else {
-                        result = !equality.toBool();
-                    }
-                }
+            Boolean equality = leftExpr.equals(rightExpr);
+            if (operator.IS() != null) {
+                result = equality;
+            } else {
+                result = !equality;
             }
         } else {
-            ArrobaNumber left = (leftExpr instanceof ArrobaNumber) ? (ArrobaNumber) leftExpr : ArrobaNumber.Zero();
-            ArrobaNumber right = (rightExpr instanceof ArrobaNumber) ? (ArrobaNumber) rightExpr : ArrobaNumber.Zero();
+            ArrobaNumber left = (leftExpr instanceof ArrobaNumber) ? (ArrobaNumber) leftExpr : ArrobaNumber.False();
+            ArrobaNumber right = (rightExpr instanceof ArrobaNumber) ? (ArrobaNumber) rightExpr : ArrobaNumber.False();
 
             if (operator.AND() != null) {
                 result = left.toBool() && right.toBool();
@@ -257,6 +325,9 @@ public class ArrobaInterpreter extends Scoped {
 
     @Override
     public ArrobaDatum visitCompilationUnit(ArrobaParser.CompilationUnitContext ctx) {
+        if (ctx == null)
+            return null;
+
         ArrobaDatum result = null;
 
         for (ArrobaParser.StmtContext stmt : ctx.stmt()) {
@@ -282,8 +353,33 @@ public class ArrobaInterpreter extends Scoped {
             return visitExprStmt(ctx.exprStmt());
         } else if (ctx.retStmt() != null) {
             return visitExpr(ctx.retStmt().expr());
+        } else if (ctx.whileStmt() != null) {
+            return visitWhileStmt(ctx.whileStmt());
         }
 
         return super.visitStmt(ctx);
+    }
+
+    @Override
+    public ArrobaDatum visitWhileStmt(ArrobaParser.WhileStmtContext ctx) {
+        ArrobaParser.ExprContext toEvaluate = ctx.expr();
+        ArrobaDatum condition = visitExpr(toEvaluate);
+        ArrobaDatum result = null;
+
+        while (condition != null && condition.toBool()) {
+            for (ArrobaParser.StmtContext stmt : ctx.stmt()) {
+                if (stmt.breakStmt() != null) {
+                    break;
+                } else if (stmt.retStmt() != null) {
+                    return visitRetStmt(stmt.retStmt());
+                }
+
+                result = visitStmt(stmt);
+            }
+
+            condition = visitExpr(toEvaluate);
+        }
+
+        return result;
     }
 }

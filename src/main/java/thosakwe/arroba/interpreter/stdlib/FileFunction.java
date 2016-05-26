@@ -8,6 +8,7 @@ import thosakwe.arroba.interpreter.data.ArrobaString;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -44,6 +45,44 @@ class ArrobaFile extends ArrobaDatum {
         try {
             file = new File(path.toString());
 
+            members.put("create", new ArrobaFunction() {
+                @Override
+                public ArrobaDatum invoke(List<ArrobaDatum> args) {
+                    Boolean result = false;
+
+                    try {
+                        result = file.createNewFile();
+                    } catch (Exception exc) {
+                        System.err.println("Could not create file: " + file.getPath());
+                    }
+
+                    return new ArrobaNumber(result ? 1.0 : 0.0);
+                }
+
+                @Override
+                public String toString() {
+                    return "<Native Function> file.create()";
+                }
+            });
+            members.put("delete", new ArrobaFunction() {
+                @Override
+                public ArrobaDatum invoke(List<ArrobaDatum> args) {
+                    Boolean result = false;
+
+                    try {
+                        result = file.delete();
+                    } catch (Exception exc) {
+                        System.err.println("Could not delete file: " + file.getPath());
+                    }
+
+                    return new ArrobaNumber(result ? 1.0 : 0.0);
+                }
+
+                @Override
+                public String toString() {
+                    return "<Native Function> file.create()";
+                }
+            });
             members.put("exists", new ArrobaFunction() {
                 @Override
                 public ArrobaDatum invoke(List<ArrobaDatum> args) {
@@ -71,6 +110,44 @@ class ArrobaFile extends ArrobaDatum {
                 @Override
                 public String toString() {
                     return "<Native Function> file.read()";
+                }
+            });
+            members.put("write", new ArrobaFunction() {
+                @Override
+                public ArrobaDatum invoke(List<ArrobaDatum> args) {
+                    if (args.isEmpty()) {
+                        System.err.println("file.write expects 1 argument");
+                        return null;
+                    }
+
+                    Boolean result = false;
+
+                    if (!file.exists()) {
+                        try {
+                            //noinspection ResultOfMethodCallIgnored
+                            file.createNewFile();
+                        } catch (Exception exc) {
+                            System.err.println("Cannot create file " + file.getPath());
+                        }
+                    }
+
+                    if (file.canWrite()) {
+                        try {
+                            PrintStream printStream = new PrintStream(file);
+                            printStream.println(args.get(0).toString());
+                            printStream.close();
+                            result = true;
+                        } catch (Exception exc) {
+                            System.err.println("Cannot write to " + file.getPath());
+                        }
+                    }
+
+                    return new ArrobaNumber(result ? 1.0 : 0.0);
+                }
+
+                @Override
+                public String toString() {
+                    return "<Native Function> file.write(text)";
                 }
             });
         } catch (Exception exc) {

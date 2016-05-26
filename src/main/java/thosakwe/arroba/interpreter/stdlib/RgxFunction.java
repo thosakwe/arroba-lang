@@ -91,7 +91,8 @@ class ArrobaMatch extends ArrobaArray {
 
     ArrobaMatch(Matcher matcher) {
         this.matcher = matcher;
-        for (int i = 0; i < matcher.groupCount(); i++) {
+
+        for (int i = 0; i <= matcher.groupCount(); i++) {
             items.add(new ArrobaPureString(matcher.group(i)));
         }
 

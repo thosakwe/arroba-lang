@@ -75,7 +75,7 @@ public class ArrobaDatum {
         /*members.put("equals", new ArrobaFunction() {
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {
-                return args.isEmpty() ? ArrobaNumber.Zero() : new ArrobaNumber(parent.equalsDatum(args.get(0)) ? 1.0 : 0.0);
+                return args.isEmpty() ? ArrobaNumber.False() : new ArrobaNumber(parent.equalsDatum(args.get(0)) ? 1.0 : 0.0);
             }
 
             @Override
@@ -87,5 +87,10 @@ public class ArrobaDatum {
 
     public Boolean equalsDatum(ArrobaDatum other) {
         return false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj == this;
     }
 }

@@ -22,7 +22,7 @@ class Scoped extends ArrobaBaseVisitor<ArrobaDatum> {
         scopes.add(globalScope);
     }
 
-    Scope createChildScope() {
+    public Scope createChildScope() {
         scopes.add(new Scope());
         return scopes.get(scopes.size() - 1);
     }

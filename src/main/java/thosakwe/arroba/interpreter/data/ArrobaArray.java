@@ -34,6 +34,18 @@ public class ArrobaArray extends ArrobaDatum {
     private void addMembers() {
         ArrobaArray parent = this;
         addEquals();
+        members.put("add", new ArrobaFunction() {
+            @Override
+            public ArrobaDatum invoke(List<ArrobaDatum> args) {
+                items.addAll(args);
+                return parent;
+            }
+
+            @Override
+            public String toString() {
+                return "<Native Function> add(...items)";
+            }
+        });
         members.put("all", new ArrobaFunction() {
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {
@@ -74,6 +86,30 @@ public class ArrobaArray extends ArrobaDatum {
             }
         });
 
+        members.put("remove", new ArrobaFunction() {
+            @Override
+            public ArrobaDatum invoke(List<ArrobaDatum> args) {
+                List<ArrobaDatum> toRemove = new ArrayList<>();
+
+                for (ArrobaDatum arg : args) {
+                    for (ArrobaDatum item : items) {
+                        if (item.equals(arg) && !toRemove.contains(item)) {
+                            toRemove.add(item);
+                        }
+                    }
+                }
+
+                items.removeAll(toRemove);
+
+                return parent;
+            }
+
+            @Override
+            public String toString() {
+                return "<Native Function> array.remove(...items)";
+            }
+        });
+
         members.put("str", new ArrobaFunction() {
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {
@@ -99,5 +135,22 @@ public class ArrobaArray extends ArrobaDatum {
     @Override
     public String toString() {
         return "Array <" + items.size() + ">";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ArrobaArray) {
+            ArrobaArray other = (ArrobaArray) obj;
+            if (other.items.size() == items.size()) {
+                for (int i = 0; i < items.size(); i++) {
+                    if (!items.get(i).equals(other.items.get(i))) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+        return false;
     }
 }

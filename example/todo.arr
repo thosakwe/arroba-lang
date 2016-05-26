@@ -1,17 +1,27 @@
 todos = [
-    "Maybe ints",
-    "Fix regex speeds",
+    # "Maybe ints",
+    # "Fix regex speeds",
     "More tests",
-    "Array add/remove, also via operators",
-    "Strings to char array",
+    # "Directories",
+    # "Array add/remove, also via operators",
     "Linter? Formatter?",
     "Compile to LLVM",
-    "Compile to C",
-    "Compile to Javascript",
+    "Sockets",
+    # "Concurrency (A.K.A. \"Tasks\")",
+    "While, better for loops, maybe...",
+    # "Equals",
     "And much more..."
 ]
 
-"The following is left to be done (${todos.len()} items):" -> print
+pluralize = fn(num, singular, plural) {
+    if (num == 1) {
+        ret num -> cat(" ") -> cat(singular)
+    } else ret num -> cat(" ") -> cat(plural)
+}
+
+items = pluralize(todos.len(), "item", "items")
+
+"The following is left to be done (${items}):" -> print
 
 todos.all(fn(x) {
     print("    * ${x}")

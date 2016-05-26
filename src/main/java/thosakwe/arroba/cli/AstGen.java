@@ -18,8 +18,8 @@ public class AstGen {
             parser.setBuildParseTree(true);
             return parser.compilationUnit();
         } catch (IOException e) {
-            System.err.println("fatal error: could not open file.");
-            e.printStackTrace();
+            System.err.println("fatal error: could not open file: " + fileName);
+            //e.printStackTrace();
             return null;
         }
     }

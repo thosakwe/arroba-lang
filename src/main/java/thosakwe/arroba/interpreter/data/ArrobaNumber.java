@@ -49,18 +49,26 @@ public class ArrobaNumber extends ArrobaDatum {
         return new ArrobaNumber(value);
     }
 
-    public static ArrobaNumber Zero() {
+    public static ArrobaNumber False() {
         return ArrobaNumber.From(0.0);
+    }
+
+    public static ArrobaNumber True() {
+        return ArrobaNumber.From(1.0);
     }
 
     @Override
     public String toString() {
+        if (value == value.intValue()) {
+            return "" + value.intValue();
+        }
+
         return value.toString();
     }
 
     @Override
     public Boolean toBool() {
-        return value != 0.0;
+        return !value.equals(0.0);
     }
 
     @Override
@@ -70,5 +78,10 @@ public class ArrobaNumber extends ArrobaDatum {
         }
 
         return super.equalsDatum(other);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof ArrobaNumber && ((ArrobaNumber) obj).value.equals(value);
     }
 }

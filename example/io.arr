@@ -3,6 +3,10 @@
 "Hello!" -> print
 print("foo", "bar", "unlimited arguments")
 
+# Print an error
+
+"Oopsies!" -> printErr
+
 # Easily read a line of input via input()
 
 name <- input()

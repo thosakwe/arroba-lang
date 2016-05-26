@@ -2,10 +2,12 @@ grammar Arroba;
 
 compilationUnit: stmt*;
 
-stmt: (assignStmt | exprStmt | ifStmt | retStmt) SEMI?;
+stmt: (assignStmt | exprStmt | ifStmt | breakStmt | retStmt | whileStmt) SEMI?;
 assignStmt: expr (ARR_L | EQUALS) expr;
 exprStmt: expr;
+breakStmt: BREAK;
 retStmt: RET expr;
+whileStmt: WHILE PAREN_L expr PAREN_R CURLY_L stmt* CURLY_R;
 
 ifStmt:  ifBlock elifBlock* elseBlock?;
 ifBlock: (IF PAREN_L expr PAREN_R stmt) | (IF PAREN_L expr PAREN_R CURLY_L stmt* CURLY_R);
@@ -17,6 +19,7 @@ expr:
     | (INT | HEX | DBL) #NumExpr
     | (TRUE | FALSE) #ConstBoolExpr
     | left=expr booleanOperator right=expr #BoolExpr
+    | EXCLAMATION expr #NegationExpr
     | expr (PLUS | MINUS | TIMES | DIVIDE | MODULO | CARET) expr #MathExpr
     | STRING #StringExpr
     | expr DOT ID #MemberExpr
@@ -25,6 +28,7 @@ expr:
     | LOCAL COLON ID #LocalExpr
     | FN paramSpec CURLY_L stmt* CURLY_R #FunctionExpr
     | paramSpec ARR_FAT expr #InlineFunctionExpr
+    | AWAIT target=expr PAREN_L ((expr COMMA)* expr)? PAREN_R? #AwaitExpr
     | target=expr PAREN_L ((expr COMMA)* expr)? PAREN_R #InvocationExpr
     | expr ARR_R expr #ArrowRightExpr
     | PAREN_L expr PAREN_R #NestedExpr
@@ -33,7 +37,7 @@ expr:
 paramSpec: (PAREN_L ((ID COMMA)* ID)? PAREN_R)?;
 
 SL_CMT: ('#' | '//') ~('\n')* -> channel(HIDDEN);
-WS: (' ' | '\n' | '\r' | '\r\n') -> skip;
+WS: (' ' | '\n' | '\r' | '\t' | '\r\n') -> skip;
 
 ARR_FAT: '=>';
 ARR_L: '<-';
@@ -70,6 +74,7 @@ ELIF: 'elif';
 ELSE: 'else';
 IS: '==' | 'is' | 'equ';
 NOT: '!=' | 'not' | 'nequ';
+EXCLAMATION: '!';
 AND: '&&' | 'and';
 OR: '||' | 'or';
 LT: '<' | 'lt';
@@ -81,9 +86,12 @@ booleanOperator: IS | NOT | AND | OR | LT | LTE | GT | GTE;
 FALSE: 'false';
 TRUE: 'true';
 
+AWAIT: 'await';
+BREAK: 'break';
 FN: 'fn';
 LOCAL: 'local';
 RET: 'ret';
+WHILE: 'while';
 
 DBL: MINUS? [0-9]+ DOT [0-9]+;
 HEX: '0x' [a-zA-Z0-9]+;
