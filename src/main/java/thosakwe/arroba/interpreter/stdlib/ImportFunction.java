@@ -29,7 +29,7 @@ public class ImportFunction extends ArrobaFunction {
     @Override
     public ArrobaDatum invoke(List<ArrobaDatum> args) {
         if (!args.isEmpty()) {
-            //interpreter.createChildScope();
+            interpreter.createChildScope();
             if (args.size() == 1) {
                 ArrobaParser.CompilationUnitContext ast = AstGen.makeAst(makeImportPath(args.get(0).toString()));
                 //interpreter.dumpScopes();

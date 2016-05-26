@@ -18,9 +18,9 @@ expr:
     ID #IdExpr
     | (INT | HEX | DBL) #NumExpr
     | (TRUE | FALSE) #ConstBoolExpr
-    | left=expr booleanOperator right=expr #BoolExpr
     | EXCLAMATION expr #NegationExpr
-    | expr (PLUS | MINUS | TIMES | DIVIDE | MODULO | CARET) expr #MathExpr
+    | expr (CARET | MODULO | TIMES | DIVIDE | PLUS | MINUS ) expr #MathExpr
+    | left=expr booleanOperator right=expr #BoolExpr
     | STRING #StringExpr
     | expr DOT ID #MemberExpr
     | target=expr SQUARE_L index=expr SQUARE_R #IndexExpr
@@ -81,7 +81,7 @@ LT: '<' | 'lt';
 LTE: LT EQUALS | 'lte';
 GT: '>' | 'gt';
 GTE: GT EQUALS | 'gte';
-booleanOperator: IS | NOT | AND | OR | LT | LTE | GT | GTE;
+booleanOperator: LT | LTE | GT | GTE | IS | NOT | AND | OR;
 
 FALSE: 'false';
 TRUE: 'true';
