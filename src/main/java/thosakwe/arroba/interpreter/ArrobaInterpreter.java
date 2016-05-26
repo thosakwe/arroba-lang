@@ -218,11 +218,11 @@ public class ArrobaInterpreter extends Scoped {
 
         if (ctx.PLUS() != null) {
 
-            if (leftValue instanceof ArrobaArray) {
+            if (leftValue instanceof ArrobaString || rightValue instanceof ArrobaString) {
+                return new ArrobaPureString(leftValue.toString() + rightValue.toString());
+            } else if (leftValue instanceof ArrobaArray) {
                 ((ArrobaArray) leftValue).items.add(rightValue);
                 return leftValue;
-            } else if (leftValue instanceof ArrobaString) {
-                return new ArrobaPureString(leftValue.toString() + rightValue.toString());
             }
 
             return ArrobaNumber.From(left.value + right.value);

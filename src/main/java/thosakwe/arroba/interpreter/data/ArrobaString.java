@@ -83,16 +83,17 @@ public class ArrobaString extends ArrobaDatum {
 
     public ArrobaString(String text, ArrobaParser.StringExprContext source, ArrobaInterpreter interpreter) {
         super(source);
-        this.text = text;
+        this.text = text
+                .replaceAll(Matcher.quoteReplacement("\\\""), "\"")
+                .replaceAll(Matcher.quoteReplacement("\\n"), "\n")
+                .replaceAll(Matcher.quoteReplacement("\\b"), "\b")
+                .replaceAll(Matcher.quoteReplacement("\\r"), "\r");
         this.interpreter = interpreter;
         addLen();
     }
 
     public String resolveValue() {
-        String result = text
-                .replaceAll(Matcher.quoteReplacement("\\\""), "\"")
-                .replaceAll(Matcher.quoteReplacement("\\n"), "\n")
-                .replaceAll(Matcher.quoteReplacement("\\r"), "\r");
+        String result = text;
         Pattern rgx = Pattern.compile("\\$\\{([^\\}]+)\\}");
         //Pattern rgx = Pattern.compile("^.*(\\$\\{([^}]+)}).*$");
         Matcher matcher = rgx.matcher(result);
