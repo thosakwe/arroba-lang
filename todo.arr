@@ -9,6 +9,9 @@ todos = [
     "Sockets",
     # "Concurrency (A.K.A. \"Tasks\")",
     "While, better for loops, maybe...",
+    "Closures should preserve variables from scope",
+    "Error handling",
+    "Stack trace",
     # "Equals",
     "And much more..."
 ]

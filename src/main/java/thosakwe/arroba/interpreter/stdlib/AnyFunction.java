@@ -8,12 +8,7 @@ import java.util.List;
 public class AnyFunction extends ArrobaFunction {
     @Override
     public ArrobaDatum invoke(List<ArrobaDatum> args) {
-        return new ArrobaDatum() {
-            @Override
-            public String toString() {
-                return "<Arbitrary data>";
-            }
-        };
+        return new ArrobaDatum();
     }
 
     @Override

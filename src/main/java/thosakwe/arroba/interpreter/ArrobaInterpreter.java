@@ -32,6 +32,7 @@ public class ArrobaInterpreter extends Scoped {
         globalScope.symbols.put("Task", new TaskFunction());
         globalScope.symbols.put("rgx", new RgxFunction());
         globalScope.symbols.put("cat", new CatFunction());
+        globalScope.symbols.put("Exception", new ExceptionFunction());
         globalScope.symbols.put("quit", new ArrobaFunction() {
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {
@@ -260,6 +261,7 @@ public class ArrobaInterpreter extends Scoped {
 
             if (target != null) {
                 target.setMember(expr.ID().getText(), visitExpr(right));
+                return target.resolve(expr.ID().getText());
             } else {
                 System.err.println("Invalid expression: " + expr.getText());
             }

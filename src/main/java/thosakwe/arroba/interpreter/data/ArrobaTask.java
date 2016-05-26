@@ -1,9 +1,7 @@
-package thosakwe.arroba.interpreter.stdlib;
+package thosakwe.arroba.interpreter.data;
 
 import thosakwe.arroba.interpreter.ArrobaFunction;
-import thosakwe.arroba.interpreter.data.ArrobaDatum;
-import thosakwe.arroba.interpreter.data.ArrobaNumber;
-import thosakwe.arroba.interpreter.data.ArrobaPureString;
+import thosakwe.arroba.interpreter.stdlib.ArrobaTaskResult;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -18,7 +16,7 @@ public class ArrobaTask extends ArrobaDatum {
     private ArrobaFunction thener;
     private ArrobaFunction catcher;
 
-    ArrobaTask(ArrobaFunction runFunc) {
+    public ArrobaTask(ArrobaFunction runFunc) {
         ArrobaTask parent = this;
         this.runFunc = runFunc;
 
@@ -90,7 +88,7 @@ public class ArrobaTask extends ArrobaDatum {
                 } catch (Exception exc) {
                     System.err.println("Task run failure: " + exc.getMessage());
                     executorService.shutdown();
-                    return null;
+                    return new ArrobaException(exc);
                 }
             }
 
@@ -105,7 +103,9 @@ public class ArrobaTask extends ArrobaDatum {
         return new FutureTask<>(() -> {
             try {
                 ArrobaDatum result = runFunc.invoke(args);
-                if (thener != null) {
+                if (result instanceof ArrobaException && catcher != null) {
+                    catcher.invoke(result);
+                } else if (thener != null) {
                     thener.invoke(result);
                 }
 
@@ -113,7 +113,7 @@ public class ArrobaTask extends ArrobaDatum {
                 return new ArrobaTaskResult(true);
             } catch (Exception exc) {
                 if (catcher != null) {
-                    catcher.invoke(new ArrobaPureString(exc.getMessage()));
+                    catcher.invoke(new ArrobaException(exc));
                 }
                 executorService.shutdown();
                 return new ArrobaTaskResult(false);

@@ -6,6 +6,7 @@ import thosakwe.arroba.interpreter.ArrobaFunction;
 import thosakwe.arroba.interpreter.ArrobaInterpreter;
 import thosakwe.arroba.interpreter.data.ArrobaArray;
 import thosakwe.arroba.interpreter.data.ArrobaDatum;
+import thosakwe.arroba.interpreter.data.ArrobaException;
 import thosakwe.arroba.interpreter.stdlib.PrintFunction;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class Main {
         String[] cliArgs = cliOptions.getArgs();
 
         if (cliOptions.hasOption("repl")) {
-            runRepl(cliArgs);
+            runRepl(cliArgs, cliOptions);
             return;
         } else if (cliOptions.getOptionValue('i') == null) {
             System.err.println("fatal error: no input file");
@@ -48,7 +49,7 @@ public class Main {
         return result;
     }
 
-    private static void runRepl(String[] args) {
+    private static void runRepl(String[] args, CommandLine cliOptions) {
         ArrobaInterpreter interpreter = new ArrobaInterpreter(args);
         Scanner scanner = new Scanner(System.in);
         PrintFunction print = new PrintFunction();
@@ -61,13 +62,19 @@ public class Main {
                 dumpResult(result, print);
             } catch (Exception exc) {
                 System.err.println("Error: " + exc.getMessage());
+
+                if (cliOptions.hasOption("debug")) {
+                    exc.printStackTrace(System.err);
+                }
             }
             System.out.print("arroba> ");
         }
     }
 
     private static void dumpResult(ArrobaDatum result, PrintFunction print) {
-        if (result instanceof ArrobaArray) {
+        if (result == null) {
+            System.out.println("<null>");
+        } else if (result instanceof ArrobaArray) {
             System.out.print("[");
             List<ArrobaDatum> items = ((ArrobaArray) result).items;
 
@@ -78,6 +85,8 @@ public class Main {
             }
 
             System.out.println("]");
+        } else if (result instanceof ArrobaException) {
+            System.err.println(result);
         } else print.invoke(result);
     }
 }

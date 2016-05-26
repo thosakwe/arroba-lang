@@ -10,6 +10,7 @@ import java.util.Map;
 public class ArrobaDatum {
     private ArrobaParser.ExprContext source;
     protected Map<String, ArrobaDatum> members = new HashMap<>();
+    public int tabCount = 0;
 
     public ArrobaDatum() {
         addEquals();
@@ -92,5 +93,43 @@ public class ArrobaDatum {
     @Override
     public boolean equals(Object obj) {
         return obj == this;
+    }
+
+    @Override
+    public String toString() {
+        String result = "";
+
+        if (members.size() == 0) {
+            return "{}";
+        }
+
+        for (int i = 0; i < tabCount; i++) {
+            result += "    ";
+        }
+        result += "{";
+
+        int k = 0;
+        for (String key : members.keySet()) {
+            for (int i = 0; i < tabCount; i++) {
+                result += "    ";
+            }
+
+            if (k > 0)
+                result += ",";
+            result += key + ": ";
+
+            ArrobaDatum found = members.get(key);
+            //found.tabCount = tabCount + 1;
+            result += found.toString();
+            found.tabCount = 0;
+            k++;
+        }
+
+        result += "";
+        for (int i = 0; i < tabCount; i++) {
+            result += "    ";
+        }
+        result += "}";
+        return result;
     }
 }
