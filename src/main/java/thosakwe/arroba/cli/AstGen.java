@@ -5,6 +5,9 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import thosakwe.arroba.antlr.ArrobaLexer;
 import thosakwe.arroba.antlr.ArrobaParser;
+import thosakwe.arroba.antlr.json.JSONLexer;
+import thosakwe.arroba.antlr.json.JSONParser;
+import thosakwe.arroba.interpreter.stdlib.ArrobaJsonParser;
 
 import java.io.IOException;
 
@@ -29,6 +32,15 @@ public class AstGen {
         ArrobaLexer lexer = new ArrobaLexer(fileStream);
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         ArrobaParser parser = new ArrobaParser(tokenStream);
+        parser.setBuildParseTree(true);
+        return parser;
+    }
+
+    public static JSONParser makeJsonParserFromText(String text) {
+        ANTLRInputStream fileStream = new ANTLRInputStream(text);
+        JSONLexer lexer = new JSONLexer(fileStream);
+        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+        JSONParser parser = new JSONParser(tokenStream);
         parser.setBuildParseTree(true);
         return parser;
     }

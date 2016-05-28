@@ -113,7 +113,7 @@ public class ArrobaDatum {
             }
 
             if (k > 0)
-                result += ",";
+                result += ", ";
             result += key + ": ";
 
             ArrobaDatum found = members.get(key);

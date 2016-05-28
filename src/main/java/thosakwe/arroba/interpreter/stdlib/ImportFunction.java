@@ -35,8 +35,11 @@ public class ImportFunction extends ArrobaFunction {
         if (!args.isEmpty()) {
             interpreter.createChildScope();
             if (args.size() == 1) {
-                if (args.get(0).toString().equals("<util>")) {
+                String importer = args.get(0).toString();
+                if (importer.equals("<util>")) {
                     return new ArrobaUtil();
+                } else if(importer.equals("<json>")) {
+                    return new ArrobaJSON();
                 }
 
                 String path = makeImportPath(args.get(0).toString());
