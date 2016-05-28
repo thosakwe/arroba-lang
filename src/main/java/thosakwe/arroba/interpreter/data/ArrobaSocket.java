@@ -28,7 +28,7 @@ public class ArrobaSocket extends ArrobaDatum {
         members.put("listen", listen());
     }
 
-    private ArrobaSocket(Socket accept) {
+    public ArrobaSocket(Socket accept) {
         this.socket = accept;
 
         connected();

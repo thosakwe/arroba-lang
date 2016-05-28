@@ -49,6 +49,6 @@ server.listen().run()
 
 # To create a client socket, just call 'connect'.
 
-client = Socket("127.0.0.1", 3000)
+client = Socket("127.0.0.1", 8888)
 await client.connect()
 client.write("YES")
