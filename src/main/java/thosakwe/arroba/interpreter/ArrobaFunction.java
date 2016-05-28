@@ -4,6 +4,7 @@ import thosakwe.arroba.antlr.ArrobaParser;
 import thosakwe.arroba.interpreter.data.ArrobaDatum;
 
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,11 @@ import java.util.Map;
 public class ArrobaFunction extends ArrobaDatum {
     public Map<String, ArrobaDatum> hoistedData = new HashMap<>();
 
+=======
+import java.util.List;
+
+public class ArrobaFunction extends ArrobaDatum {
+>>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
     protected ArrobaFunction() {
         addEquals();
     }

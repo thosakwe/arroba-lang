@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import thosakwe.arroba.antlr.ArrobaParser;
 import thosakwe.arroba.interpreter.data.ArrobaDatum;
 
+<<<<<<< HEAD
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,15 @@ class ArrobaFullFunction extends ArrobaFunction {
     private ArrobaParser.FunctionExprContext source;
 
     ArrobaFullFunction(ArrobaParser.FunctionExprContext source, ArrobaInterpreter interpreter) {
+=======
+import java.util.List;
+
+class ArrobaFullFunction extends ArrobaFunction {
+    private ArrobaInterpreter interpreter;
+    ArrobaParser.FunctionExprContext source;
+
+    public ArrobaFullFunction(ArrobaParser.FunctionExprContext source, ArrobaInterpreter interpreter) {
+>>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
         this.source = source;
         this.interpreter = interpreter;
     }
@@ -22,6 +32,7 @@ class ArrobaFullFunction extends ArrobaFunction {
         ArrobaDatum result = null;
         interpreter.createChildScope();
 
+<<<<<<< HEAD
         ClosureHoister hoister = new ClosureHoister(true);
         hoister.visitFunctionExpr(source);
 
@@ -37,6 +48,10 @@ class ArrobaFullFunction extends ArrobaFunction {
             interpreter.value(symbol, hoistedData.get(symbol));
         }
 
+=======
+        loadParams(args, source.paramSpec(), interpreter);
+
+>>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
         // Manually execute each statement, until we reach a "ret"
         for (ArrobaParser.StmtContext stmt : source.stmt()) {
             result = interpreter.visitStmt(stmt);
@@ -80,6 +95,7 @@ class ArrobaInlineFunction extends ArrobaFunction {
     public ArrobaDatum invoke(List<ArrobaDatum> args) {
         interpreter.createChildScope();
 
+<<<<<<< HEAD
         ClosureHoister hoister = new ClosureHoister(true);
         hoister.visitInlineFunctionExpr(source);
 
@@ -97,6 +113,10 @@ class ArrobaInlineFunction extends ArrobaFunction {
             interpreter.value(symbol, hoistedData.get(symbol));
         }
 
+=======
+        loadParams(args, source.paramSpec(), interpreter);
+
+>>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
         ArrobaDatum result = interpreter.visitExpr(source.expr());
 
         // Destroy that last scope

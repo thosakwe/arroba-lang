@@ -11,14 +11,21 @@ task.then(fn(x) {
 # And an error handler.
 # The error will receive a string, the error message.
 
+<<<<<<< HEAD
 task.fail(printErr)
+=======
+task.catch(printErr)
+>>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
 
 # Fire the task, asynchronously.
 task.run(418)
 
+<<<<<<< HEAD
 # Tasks are single-use only objects.
 # They cannot be re-used.
 
+=======
+>>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
 # You can run the task and have it block.
 # Just use yield.
 

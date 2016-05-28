@@ -72,10 +72,13 @@ class Scoped extends ArrobaBaseVisitor<ArrobaDatum> {
         return value;
     }
 
+<<<<<<< HEAD
     ArrobaDatum value(String symbol, ArrobaDatum value) {
         return value(symbol, value, false);
     }
 
+=======
+>>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
     private ArrobaDatum resolveSymbol(String symbol) {
         //System.out.println("Resolving: " + symbol);
         // Search scopes from bottom to top
