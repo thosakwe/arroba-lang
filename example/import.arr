@@ -7,11 +7,11 @@
 
 # Using this with any() allows a namespace-like construct.
 
-<<<<<<< HEAD
+
 doIt = import("example/import_me")
-=======
+
 doIt = import("example/import_me.arr")
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
 doIt()
 
 # You can import files bundled with arroba via

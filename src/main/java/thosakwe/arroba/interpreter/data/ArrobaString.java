@@ -83,12 +83,9 @@ public class ArrobaString extends ArrobaDatum {
 
     public ArrobaString(String text, ArrobaParser.StringExprContext source, ArrobaInterpreter interpreter) {
         super(source);
-<<<<<<< HEAD
+
         this.text = (text == null) ? "" : text;
-        this.text = this.text
-=======
         this.text = text
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
                 .replaceAll(Matcher.quoteReplacement("\\\""), "\"")
                 .replaceAll(Matcher.quoteReplacement("\\n"), "\n")
                 .replaceAll(Matcher.quoteReplacement("\\b"), "\b")

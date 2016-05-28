@@ -19,12 +19,12 @@ elifBlock: (ELSE IF PAREN_L expr PAREN_R stmt) | (ELSE IF PAREN_L expr PAREN_R C
 elseBlock: (ELSE stmt) | (ELSE CURLY_L stmt* CURLY_R);
 
 expr:
-<<<<<<< HEAD
+
     expr DOT ID #MemberExpr
     | ID #IdExpr
-=======
+
     ID #IdExpr
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
     | (INT | HEX | DBL) #NumExpr
     | (TRUE | FALSE) #ConstBoolExpr
     | EXCLAMATION expr #NegationExpr
@@ -32,20 +32,20 @@ expr:
     | expr (CARET | MODULO | TIMES | DIVIDE | PLUS | MINUS ) expr #MathExpr
     | left=expr booleanOperator right=expr #BoolExpr
     | STRING #StringExpr
-<<<<<<< HEAD
-=======
+
+
     | expr DOT ID #MemberExpr
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
     | target=expr SQUARE_L index=expr SQUARE_R #IndexExpr
     | SQUARE_L ((expr COMMA)* expr)? SQUARE_R #ArrayExpr
     | LOCAL COLON ID #LocalExpr
     | FN paramSpec CURLY_L stmt* CURLY_R #FunctionExpr
     | paramSpec ARR_FAT expr #InlineFunctionExpr
-<<<<<<< HEAD
+
     | AWAIT target=expr (PAREN_L ((expr COMMA)* expr)? PAREN_R)? #AwaitExpr
-=======
+
     | AWAIT target=expr PAREN_L ((expr COMMA)* expr)? PAREN_R? #AwaitExpr
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
     | expr ARR_R expr #ArrowRightExpr
     | PAREN_L expr PAREN_R #NestedExpr
 ;

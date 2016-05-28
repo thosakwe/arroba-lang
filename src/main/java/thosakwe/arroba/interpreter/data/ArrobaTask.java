@@ -20,11 +20,9 @@ public class ArrobaTask extends ArrobaDatum {
         ArrobaTask parent = this;
         this.runFunc = runFunc;
 
-<<<<<<< HEAD
+
         members.put("fail", new ArrobaFunction() {
-=======
-        members.put("catch", new ArrobaFunction() {
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {
                 if (!args.isEmpty() && args.get(0) instanceof ArrobaFunction) {
@@ -32,21 +30,17 @@ public class ArrobaTask extends ArrobaDatum {
                     return parent;
                 }
 
-<<<<<<< HEAD
+
                 System.err.println("task.fail expects argument 1 to be a function");
-=======
+
                 System.err.println("task.catch expects argument 1 to be a function");
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
                 return null;
             }
 
             @Override
             public String toString() {
-<<<<<<< HEAD
                 return "<Native Function> task.fail(handler)";
-=======
-                return "<Native Function> task.catch(catcher)";
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
             }
         });
         members.put("then", new ArrobaFunction() {

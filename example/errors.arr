@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Wrap code in  try-catch block to preemptively handle errors.
 
 try {
@@ -17,17 +17,17 @@ volatile = Task(fn() {
     # You can also create exceptions via Exception(msg?, value?, stackTrace?).
     # In this case, you can even just 'ret' the exception and it will be caught.
 
-=======
+
 # Tasks can return errors, too.
 
 task volatile = Task(fn() {
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
     ret Exception("We can return or throw exceptions. Cool.")
 })
 
 volatile.then(fn() {
     print("This callback will never be run")
-<<<<<<< HEAD
+
 }).fail(fn(exc) {
     printErr(exc.msg)
 }).run()
@@ -45,8 +45,8 @@ Task(fn() {
     } catch(exc) {
         printErr("Something is wrong: ${exc.value}")
     }
-=======
+
 }).catch(fn(exc) {
     printErr(exc.msg)
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
 }).run()

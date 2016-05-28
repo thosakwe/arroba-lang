@@ -23,12 +23,10 @@ public class ImportFunction extends ArrobaFunction {
     private String makeImportPath(String importer) {
         if (importer.startsWith("<") && importer.endsWith(">")) {
             return new File(incDir, importer.replaceAll("(^<)|(>$)", "") + ".arr").getAbsolutePath();
-<<<<<<< HEAD
+
         } else if (!importer.endsWith(".arr")) return importer + ".arr";
         else return importer;
-=======
-        } else return importer;
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
     }
 
     @Override

@@ -10,11 +10,11 @@ public class ExceptionFunction extends ArrobaFunction {
     @Override
     public ArrobaDatum invoke(List<ArrobaDatum> args) {
         ArrobaException exception = new ArrobaException();
-<<<<<<< HEAD
+
         //exception.message = "An unhandled exception occurred.";
-=======
+
         exception.message = "An unhandled exception occurred.";
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
 
         if (args.size() > 0)
             exception.message = args.get(0).toString();

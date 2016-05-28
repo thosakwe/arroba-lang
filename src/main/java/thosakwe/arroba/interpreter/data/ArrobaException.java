@@ -9,7 +9,7 @@ public class ArrobaException extends ArrobaDatum {
 
     }
 
-<<<<<<< HEAD
+
     public ArrobaException(String message) {
         this.message = message;
         addMembers();
@@ -20,8 +20,7 @@ public class ArrobaException extends ArrobaDatum {
         addMembers();
     }
 
-=======
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
     public void addMembers() {
         members.put("msg", new ArrobaPureString(message));
         members.put("stack", new ArrobaPureString(stackTrace));
@@ -33,7 +32,7 @@ public class ArrobaException extends ArrobaDatum {
         addMembers();
     }
 
-<<<<<<< HEAD
+
     private String getMessage() {
         if (message != null)
             return message;
@@ -47,14 +46,7 @@ public class ArrobaException extends ArrobaDatum {
         if (value != null)
             result += "Thrown value: " + value.toString() + "\n";
         if (stackTrace != null)
-=======
-    @Override
-    public String toString() {
-        String result = "Arroba Exception: " + message + "\n";
-        if (value != null)
-            result += "Thrown value: " + value.toString() + "\n";
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
-        result += "Stack Trace:\n" + stackTrace;
+            result += "Stack Trace:\n" + stackTrace;
         return result;
     }
 }

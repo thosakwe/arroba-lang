@@ -1,9 +1,9 @@
 package thosakwe.arroba.interpreter;
 
-<<<<<<< HEAD
+
 import org.antlr.v4.runtime.tree.TerminalNode;
-=======
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
+
 import thosakwe.arroba.antlr.ArrobaParser;
 import thosakwe.arroba.interpreter.data.*;
 import thosakwe.arroba.interpreter.stdlib.*;
@@ -111,7 +111,7 @@ public class ArrobaInterpreter extends Scoped {
 
             return new ArrobaNumber(truth ? 1.0 : 0.0);
         } else if (expr instanceof ArrobaParser.FunctionExprContext) {
-<<<<<<< HEAD
+
             ArrobaFunction result = new ArrobaFullFunction((ArrobaParser.FunctionExprContext) expr, this);
 
             ClosureHoister hoister = new ClosureHoister(true);
@@ -146,11 +146,9 @@ public class ArrobaInterpreter extends Scoped {
             }
 
             return result;
-=======
-            return new ArrobaFullFunction((ArrobaParser.FunctionExprContext) expr, this);
         } else if (expr instanceof ArrobaParser.InlineFunctionExprContext) {
             return new ArrobaInlineFunction((ArrobaParser.InlineFunctionExprContext) expr, this);
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
         } else if (expr instanceof ArrobaParser.MathExprContext) {
             return resolveMathExpr((ArrobaParser.MathExprContext) expr);
         } else if (expr instanceof ArrobaParser.NumExprContext) {
@@ -172,13 +170,12 @@ public class ArrobaInterpreter extends Scoped {
             }
 
             System.err.println("You can only await tasks.");
-<<<<<<< HEAD
+
             if (target == null)
                 System.err.println("Null values cannot be awaited!");
             else System.err.println("Instead, you tried to await this: " + target.toString());
 
-=======
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
             return null;
         } else if (expr instanceof ArrobaParser.IndexExprContext) {
             ArrobaParser.IndexExprContext ctx = (ArrobaParser.IndexExprContext) expr;
@@ -267,37 +264,38 @@ public class ArrobaInterpreter extends Scoped {
 
         if (ctx.PLUS() != null) {
 
-<<<<<<< HEAD
+
             if (leftValue instanceof ArrobaArray) {
                 ((ArrobaArray) leftValue).items.add(rightValue);
                 return leftValue;
             } else if (leftValue instanceof ArrobaString || rightValue instanceof ArrobaString) {
-                return new ArrobaPureString(leftValue.toString() + rightValue.toString());
-=======
-            if (leftValue instanceof ArrobaString || rightValue instanceof ArrobaString) {
-                return new ArrobaPureString(leftValue.toString() + rightValue.toString());
-            } else if (leftValue instanceof ArrobaArray) {
-                ((ArrobaArray) leftValue).items.add(rightValue);
-                return leftValue;
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
-            }
+                //return new ArrobaPureString(leftValue.toString() + rightValue.toString());
 
-            return ArrobaNumber.From(left.value + right.value);
-        } else if (ctx.MINUS() != null) {
-            if (leftValue instanceof ArrobaArray) {
-                ((ArrobaArray) leftValue).items.remove(rightValue);
-                return leftValue;
-            }
+                if (leftValue instanceof ArrobaString || rightValue instanceof ArrobaString) {
+                    return new ArrobaPureString(leftValue.toString() + rightValue.toString());
+                } else if (leftValue instanceof ArrobaArray) {
+                    ((ArrobaArray) leftValue).items.add(rightValue);
+                    return leftValue;
 
-            return ArrobaNumber.From(left.value - right.value);
-        } else if (ctx.TIMES() != null)
-            return ArrobaNumber.From(left.value * right.value);
-        else if (ctx.DIVIDE() != null)
-            return ArrobaNumber.From(left.value / right.value);
-        else if (ctx.CARET() != null)
-            return ArrobaNumber.From(Math.pow(left.value, right.value));
-        else if (ctx.MODULO() != null)
-            return ArrobaNumber.From(left.value % right.value);
+                }
+
+                return ArrobaNumber.From(left.value + right.value);
+            } else if (ctx.MINUS() != null) {
+                if (leftValue instanceof ArrobaArray) {
+                    ((ArrobaArray) leftValue).items.remove(rightValue);
+                    return leftValue;
+                }
+
+                return ArrobaNumber.From(left.value - right.value);
+            } else if (ctx.TIMES() != null)
+                return ArrobaNumber.From(left.value * right.value);
+            else if (ctx.DIVIDE() != null)
+                return ArrobaNumber.From(left.value / right.value);
+            else if (ctx.CARET() != null)
+                return ArrobaNumber.From(Math.pow(left.value, right.value));
+            else if (ctx.MODULO() != null)
+                return ArrobaNumber.From(left.value % right.value);
+        }
 
         return null;
     }
@@ -411,13 +409,13 @@ public class ArrobaInterpreter extends Scoped {
             return visitExprStmt(ctx.exprStmt());
         } else if (ctx.retStmt() != null) {
             return visitExpr(ctx.retStmt().expr());
-<<<<<<< HEAD
+
         } else if (ctx.throwStmt() != null) {
             return visitThrowStmt(ctx.throwStmt());
         } else if (ctx.tryStmt() != null) {
             return visitTryStmt(ctx.tryStmt());
-=======
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
+
         } else if (ctx.whileStmt() != null) {
             return visitWhileStmt(ctx.whileStmt());
         }
@@ -426,7 +424,7 @@ public class ArrobaInterpreter extends Scoped {
     }
 
     @Override
-<<<<<<< HEAD
+
     public ArrobaDatum visitThrowStmt(ArrobaParser.ThrowStmtContext ctx) {
         ArrobaDatum toThrow = visitExpr(ctx.expr());
 
@@ -474,8 +472,8 @@ public class ArrobaInterpreter extends Scoped {
     }
 
     @Override
-=======
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
+
+
     public ArrobaDatum visitWhileStmt(ArrobaParser.WhileStmtContext ctx) {
         ArrobaParser.ExprContext toEvaluate = ctx.expr();
         ArrobaDatum condition = visitExpr(toEvaluate);

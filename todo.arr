@@ -10,14 +10,11 @@ todos = [
     # "Concurrency (A.K.A. \"Tasks\")",
     "While, better for loops, maybe...",
     "Closures should preserve variables from scope",
-<<<<<<< HEAD
     # "Error handling",
     "Stack trace",
     "Run process task",
-=======
     "Error handling",
     "Stack trace",
->>>>>>> 1ee8b1c0a3f6e1d6b40644fab3f9a010059b406f
     # "Equals",
     "And much more..."
 ]
