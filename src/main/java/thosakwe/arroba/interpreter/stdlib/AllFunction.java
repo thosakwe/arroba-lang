@@ -3,6 +3,7 @@ package thosakwe.arroba.interpreter.stdlib;
 import thosakwe.arroba.interpreter.ArrobaFunction;
 import thosakwe.arroba.interpreter.data.ArrobaArray;
 import thosakwe.arroba.interpreter.data.ArrobaDatum;
+import thosakwe.arroba.interpreter.data.ArrobaException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +34,7 @@ public class AllFunction extends ArrobaFunction {
                         return new ArrobaArray(results);
                     }
 
-                    System.err.println("Loop expects argument 1 to be an array");
-                    return null;
+                    return new ArrobaException("Loop expects argument 1 to be an array");
                 }
 
                 @Override
@@ -44,8 +44,7 @@ public class AllFunction extends ArrobaFunction {
             };
         }
 
-        System.err.println("Print expects argument 1 to be a function");
-        return null;
+        return new ArrobaException("Print expects argument 1 to be a function");
     }
 
     @Override

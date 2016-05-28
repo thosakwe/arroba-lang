@@ -6,6 +6,7 @@ import thosakwe.arroba.interpreter.ArrobaFunction;
 import thosakwe.arroba.interpreter.ArrobaInterpreter;
 import thosakwe.arroba.interpreter.data.ArrobaArray;
 import thosakwe.arroba.interpreter.data.ArrobaDatum;
+import thosakwe.arroba.interpreter.data.ArrobaException;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +35,12 @@ public class ImportFunction extends ArrobaFunction {
         if (!args.isEmpty()) {
             interpreter.createChildScope();
             if (args.size() == 1) {
-                ArrobaParser.CompilationUnitContext ast = AstGen.makeAst(makeImportPath(args.get(0).toString()));
+                if (args.get(0).toString().equals("<util>")) {
+                    return new ArrobaUtil();
+                }
+
+                String path = makeImportPath(args.get(0).toString());
+                ArrobaParser.CompilationUnitContext ast = AstGen.makeAst(path);
                 //interpreter.dumpScopes();
                 return interpreter.visitCompilationUnit(ast);
             } else {
@@ -49,8 +55,7 @@ public class ImportFunction extends ArrobaFunction {
             }
         }
 
-        System.err.println("import expects at least one argument");
-        return null;
+        return new ArrobaException("import expects at least one argument");
     }
 
     @Override

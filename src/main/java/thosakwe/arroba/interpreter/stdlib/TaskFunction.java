@@ -2,6 +2,7 @@ package thosakwe.arroba.interpreter.stdlib;
 
 import thosakwe.arroba.interpreter.ArrobaFunction;
 import thosakwe.arroba.interpreter.data.ArrobaDatum;
+import thosakwe.arroba.interpreter.data.ArrobaException;
 import thosakwe.arroba.interpreter.data.ArrobaNumber;
 import thosakwe.arroba.interpreter.data.ArrobaTask;
 
@@ -15,12 +16,10 @@ public class TaskFunction extends ArrobaFunction {
                 return new ArrobaTask((ArrobaFunction) args.get(0));
             }
 
-            System.err.println("Task expects argument 1 to be a function");
-            return null;
+            return new ArrobaException("Task expects argument 1 to be a function");
         }
 
-        System.err.println("Task expects 1 argument");
-        return null;
+        return new ArrobaException("Task expects 1 argument");
     }
 
     @Override

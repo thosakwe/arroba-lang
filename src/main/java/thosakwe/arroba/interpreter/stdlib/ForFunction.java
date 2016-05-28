@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import thosakwe.arroba.interpreter.ArrobaFunction;
 import thosakwe.arroba.interpreter.ArrobaInterpreter;
 import thosakwe.arroba.interpreter.data.ArrobaDatum;
+import thosakwe.arroba.interpreter.data.ArrobaException;
 import thosakwe.arroba.interpreter.data.ArrobaNumber;
 
 import java.util.ArrayList;
@@ -14,17 +15,14 @@ public class ForFunction extends ArrobaFunction {
     @Override
     public ArrobaDatum invoke(List<ArrobaDatum> args) {
         if (args.size() == 0) {
-            System.err.println("Error: no arguments provided");
-            return null;
+            return new ArrobaException("Error: no arguments provided");
         }
 
         ArrobaDatum target = args.get(0);
 
         if (target instanceof ArrobaNumber) {
             return new ForFunctionStub(((ArrobaNumber) target).value.intValue());
-        } else System.err.println("Given argument is not a number");
-
-        return null;
+        } else return new ArrobaException("Given argument is not a number");
     }
 
     @Override
@@ -43,8 +41,7 @@ class ForFunctionStub extends ArrobaFunction {
     @Override
     public ArrobaDatum invoke(List<ArrobaDatum> args) {
         if (args.size() == 0) {
-            System.err.println("Error: no arguments provided");
-            return null;
+            return new ArrobaException("Error: no arguments provided");
         }
 
         ArrobaDatum target = args.get(0);
@@ -55,7 +52,7 @@ class ForFunctionStub extends ArrobaFunction {
             for (int i = 0; i < times; i++) {
                 func.invoke(arguments);
             }
-        } else System.err.println("Given argument is not a function");
+        } else return new ArrobaException("Given argument is not a function");
         return null;
     }
 

@@ -27,8 +27,7 @@ public class RgxFunction extends ArrobaFunction {
             return result;
         }
 
-        System.err.println("rgx expects argument 1 to be a string");
-        return super.invoke(args);
+        return new ArrobaException("rgx expects argument 1 to be a string");
     }
 
     @Override
@@ -63,8 +62,7 @@ class ArrobaMatcher extends ArrobaFunction {
                     return new ArrobaMatch(matcher);
                 }
 
-                System.err.println("Given string (" + subject.toString() + ") does not match pattern (" + pattern.pattern() + ")");
-                return null;
+                return new ArrobaException("Given string (" + subject.toString() + ") does not match pattern (" + pattern.pattern() + ")");
             } else {
                 List<ArrobaMatch> matches = new ArrayList<>();
 
@@ -76,8 +74,7 @@ class ArrobaMatcher extends ArrobaFunction {
             }
         }
 
-        System.err.println("Matcher expects argument 1 to be a string");
-        return null;
+        return new ArrobaException("Matcher expects argument 1 to be a string");
     }
 
     @Override
@@ -107,8 +104,7 @@ class ArrobaMatch extends ArrobaArray {
                     return new ArrobaPureString(matcher.group(((ArrobaNumber) target).value.intValue()));
                 }
 
-                System.err.println("match.group expects argument 1 to be a string or number");
-                return null;
+                return new ArrobaException("match.group expects argument 1 to be a string or number");
             }
 
             @Override

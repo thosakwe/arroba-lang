@@ -12,6 +12,10 @@ public class ArrobaNumber extends ArrobaDatum {
         addStr();
     }
 
+    public ArrobaNumber(int value) {
+        this.value = value * 1.0;
+    }
+
     private void addStr() {
         addEquals();
         members.put("str", new ArrobaFunction() {
@@ -55,6 +59,14 @@ public class ArrobaNumber extends ArrobaDatum {
 
     public static ArrobaNumber True() {
         return ArrobaNumber.From(1.0);
+    }
+
+    public Boolean isByte() {
+        return value == value.byteValue();
+    }
+
+    Boolean isInt() {
+        return value == value.intValue();
     }
 
     @Override

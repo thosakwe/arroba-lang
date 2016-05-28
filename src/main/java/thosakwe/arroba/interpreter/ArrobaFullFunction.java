@@ -24,25 +24,8 @@ class ArrobaFullFunction extends ArrobaFunction {
         ArrobaDatum result = null;
         interpreter.createChildScope();
 
-
-        ClosureHoister hoister = new ClosureHoister(true);
-        hoister.visitFunctionExpr(source);
-
+        hoist(source, interpreter);
         loadParams(args, source.paramSpec(), interpreter);
-
-        // Copy necessary data to the given function's scope...
-        for (String symbol : hoister.externalSymbols) {
-            //System.out.println("Hoisting " + symbol + " -> " + interpreter.value(symbol));
-            hoistedData.put(symbol, interpreter.value(symbol));
-        }
-
-        for (String symbol : hoistedData.keySet()) {
-            interpreter.value(symbol, hoistedData.get(symbol));
-        }
-
-
-        loadParams(args, source.paramSpec(), interpreter);
-
 
         // Manually execute each statement, until we reach a "ret"
         for (ArrobaParser.StmtContext stmt : source.stmt()) {
@@ -87,19 +70,8 @@ class ArrobaInlineFunction extends ArrobaFunction {
     public ArrobaDatum invoke(List<ArrobaDatum> args) {
         interpreter.createChildScope();
 
-
-        ClosureHoister hoister = new ClosureHoister(true);
-        hoister.visitInlineFunctionExpr(source);
-
         loadParams(args, source.paramSpec(), interpreter);
-
-        // Copy necessary data to the given function's scope...
-        for (String symbol : hoister.externalSymbols) {
-            System.out.println("Hoisting " + symbol + " -> " + interpreter.value(symbol));
-            hoistedData.put(symbol, interpreter.value(symbol));
-        }
-
-        System.err.println(source.getText());
+        hoist(source, interpreter, true);
 
         for (String symbol : hoistedData.keySet()) {
             interpreter.value(symbol, hoistedData.get(symbol));

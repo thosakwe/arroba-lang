@@ -5,6 +5,7 @@ import thosakwe.arroba.cli.AstGen;
 import thosakwe.arroba.interpreter.ArrobaFunction;
 import thosakwe.arroba.interpreter.ArrobaInterpreter;
 import thosakwe.arroba.interpreter.data.ArrobaDatum;
+import thosakwe.arroba.interpreter.data.ArrobaException;
 import thosakwe.arroba.interpreter.data.ArrobaString;
 
 import java.util.List;
@@ -24,8 +25,7 @@ public class EvalFunction extends ArrobaFunction {
             return interpreter.visitCompilationUnit(parser.compilationUnit());
         }
 
-        System.err.println("eval expects argument 1 to be a string");
-        return null;
+        return new ArrobaException("eval expects argument 1 to be a string");
     }
 
     @Override

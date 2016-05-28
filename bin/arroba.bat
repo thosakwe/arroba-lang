@@ -1,2 +1,2 @@
 @echo off
-java -jar "%~dp0..\out\artifacts\arroba_jar\arroba.jar" %*
+java -jar "%~dp0..\target\arroba-1.0-SNAPSHOT.jar" %*

@@ -19,38 +19,26 @@ elifBlock: (ELSE IF PAREN_L expr PAREN_R stmt) | (ELSE IF PAREN_L expr PAREN_R C
 elseBlock: (ELSE stmt) | (ELSE CURLY_L stmt* CURLY_R);
 
 expr:
-
     expr DOT ID #MemberExpr
     | ID #IdExpr
-
-    ID #IdExpr
-
     | (INT | HEX | DBL) #NumExpr
     | (TRUE | FALSE) #ConstBoolExpr
     | EXCLAMATION expr #NegationExpr
+    | AWAIT target=expr (PAREN_L ((expr COMMA)* expr)? PAREN_R) #AwaitExpr
     | target=expr PAREN_L ((expr COMMA)* expr)? PAREN_R #InvocationExpr
     | expr (CARET | MODULO | TIMES | DIVIDE | PLUS | MINUS ) expr #MathExpr
     | left=expr booleanOperator right=expr #BoolExpr
     | STRING #StringExpr
-
-
-    | expr DOT ID #MemberExpr
-
     | target=expr SQUARE_L index=expr SQUARE_R #IndexExpr
     | SQUARE_L ((expr COMMA)* expr)? SQUARE_R #ArrayExpr
     | LOCAL COLON ID #LocalExpr
     | FN paramSpec CURLY_L stmt* CURLY_R #FunctionExpr
     | paramSpec ARR_FAT expr #InlineFunctionExpr
-
-    | AWAIT target=expr (PAREN_L ((expr COMMA)* expr)? PAREN_R)? #AwaitExpr
-
-    | AWAIT target=expr PAREN_L ((expr COMMA)* expr)? PAREN_R? #AwaitExpr
-
     | expr ARR_R expr #ArrowRightExpr
     | PAREN_L expr PAREN_R #NestedExpr
 ;
 
-paramSpec: (PAREN_L ((ID COMMA)* ID)? PAREN_R)?;
+paramSpec: ((PAREN_L ((ID COMMA)* ID)? PAREN_R) || ID);
 
 SL_CMT: ('#' | '//') ~('\n')* -> channel(HIDDEN);
 WS: (' ' | '\n' | '\r' | '\t' | '\r\n') -> skip;

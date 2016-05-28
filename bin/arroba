@@ -3,4 +3,4 @@
 cd `dirname $0`
 SCRIPTDIR=`pwd`
 cd -
-java -jar "$SCRIPTDIR/../out/artifacts/arroba_jar/arroba.jar" $@
+java -jar "$SCRIPTDIR/../target/arroba-1.0-SNAPSHOT.jar" $@

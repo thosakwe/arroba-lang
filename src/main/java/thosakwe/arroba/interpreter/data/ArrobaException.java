@@ -29,6 +29,11 @@ public class ArrobaException extends ArrobaDatum {
 
     public ArrobaException(Exception exc) {
         message = exc.getMessage();
+        stackTrace = "";
+
+        for (StackTraceElement stackTraceElement : exc.getStackTrace()) {
+            stackTrace += "\t" + stackTraceElement.toString() + "\n";
+        }
         addMembers();
     }
 

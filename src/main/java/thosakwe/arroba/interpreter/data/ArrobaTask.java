@@ -7,19 +7,25 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
 public class ArrobaTask extends ArrobaDatum {
     private ArrobaFunction runFunc;
-    private ExecutorService executorService = Executors.newFixedThreadPool(255);
 
     private ArrobaFunction thener;
-    private ArrobaFunction catcher;
+    public ArrobaFunction catcher;
+
+    public ArrobaTask() {
+        addMembers();
+    }
 
     public ArrobaTask(ArrobaFunction runFunc) {
-        ArrobaTask parent = this;
         this.runFunc = runFunc;
+        addMembers();
+    }
 
+    private void addMembers() {
+        ArrobaTask parent = this;
+        ArrobaFunction run = yield();
 
         members.put("fail", new ArrobaFunction() {
 
@@ -31,11 +37,7 @@ public class ArrobaTask extends ArrobaDatum {
                 }
 
 
-                System.err.println("task.fail expects argument 1 to be a function");
-
-                System.err.println("task.catch expects argument 1 to be a function");
-
-                return null;
+                return new ArrobaException("task.fail expects argument 1 to be a function");
             }
 
             @Override
@@ -43,7 +45,7 @@ public class ArrobaTask extends ArrobaDatum {
                 return "<Native Function> task.fail(handler)";
             }
         });
-        members.put("then", new ArrobaFunction() {
+        members.put("ok", new ArrobaFunction() {
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {
                 if (!args.isEmpty() && args.get(0) instanceof ArrobaFunction) {
@@ -51,8 +53,7 @@ public class ArrobaTask extends ArrobaDatum {
                     return parent;
                 }
 
-                System.err.println("task.then expects argument 1 to be a function");
-                return null;
+                return new ArrobaException("task.then expects argument 1 to be a function");
             }
 
             @Override
@@ -65,11 +66,13 @@ public class ArrobaTask extends ArrobaDatum {
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {
                 try {
-                    FutureTask<ArrobaDatum> futureTask = makeTask(args);
-                    executorService.execute(futureTask);
-                    return ArrobaNumber.True();
+                    ExecutorService executorService = Executors.newFixedThreadPool(1);
+                    Future<ArrobaDatum> future = makeTask(args, executorService);
+                    Thread thread = new Thread(new ArrobaTaskThread(future));
+                    thread.start();
+                    return parent;
                 } catch (Exception exc) {
-                    return ArrobaNumber.False();
+                    return new ArrobaException(exc);
                 }
             }
 
@@ -79,36 +82,29 @@ public class ArrobaTask extends ArrobaDatum {
             }
         });
 
-        members.put("yield", yield());
-    }
-
-    public ArrobaFunction yield() {
-        return new ArrobaFunction() {
+        members.put("yield", new ArrobaFunction() {
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {
-                try {
-                    Future<ArrobaDatum> future = executorService.submit(() -> runFunc.invoke(args));
-                    ArrobaDatum result = future.get();
-                    executorService.shutdown();
-                    return result;
-                } catch (Exception exc) {
-                    System.err.println("Task run failure: " + exc.getMessage());
-                    executorService.shutdown();
-                    return new ArrobaException(exc);
-                }
+                return run.invoke(args);
             }
 
             @Override
             public String toString() {
                 return "<Native Function> task.yield(...args)";
             }
-        };
+        });
     }
 
-    private FutureTask<ArrobaDatum> makeTask(List<ArrobaDatum> args) {
-        return new FutureTask<>(() -> {
+    public ArrobaFunction yield() {
+        return runFunc;
+    }
+
+    private Future<ArrobaDatum> makeTask(List<ArrobaDatum> args, ExecutorService executorService) {
+        ArrobaFunction run = yield();
+
+        return executorService.submit(() -> {
             try {
-                ArrobaDatum result = runFunc.invoke(args);
+                ArrobaDatum result = run.invoke(args);
                 if (result instanceof ArrobaException && catcher != null) {
                     catcher.invoke(result);
                 } else if (thener != null) {
@@ -129,6 +125,25 @@ public class ArrobaTask extends ArrobaDatum {
 
     @Override
     public String toString() {
-        return "<Task:" + runFunc + ">";
+        if (runFunc != null)
+            return "<Task:" + runFunc + ">";
+        else return "<Task>";
+    }
+}
+
+class ArrobaTaskThread extends Thread {
+    private final Future<ArrobaDatum> toRun;
+
+    ArrobaTaskThread(Future<ArrobaDatum> toRun) {
+        this.toRun = toRun;
+    }
+
+    @Override
+    public void run() {
+        try {
+            toRun.get();
+        } catch (Exception exc) {
+            // Nothing
+        }
     }
 }

@@ -1,5 +1,6 @@
 package thosakwe.arroba.interpreter;
 
+import org.antlr.v4.runtime.tree.ParseTree;
 import thosakwe.arroba.antlr.ArrobaParser;
 import thosakwe.arroba.interpreter.data.ArrobaDatum;
 
@@ -18,6 +19,32 @@ public class ArrobaFunction extends ArrobaDatum {
     }
 
     public ArrobaFunction() {
+    }
+
+    void hoist(ParseTree ctx, ArrobaInterpreter interpreter, Boolean inline) {
+        ClosureHoister hoister = new ClosureHoister(true);
+
+        if (inline)
+            hoister.visitInlineFunctionExpr((ArrobaParser.InlineFunctionExprContext) ctx);
+        else hoister.visitFunctionExpr((ArrobaParser.FunctionExprContext) ctx);
+
+        // Copy necessary data to the given function's scope...
+        for (String symbol : hoister.externalSymbols) {
+            ArrobaDatum resolvedValue = interpreter.value(symbol);
+
+            if (resolvedValue != null) {
+                //System.out.println("Hoisting " + symbol + " -> " + interpreter.value(symbol));
+                hoistedData.put(symbol, interpreter.value(symbol));
+            }
+        }
+
+        for (String symbol : hoistedData.keySet()) {
+            interpreter.value(symbol, hoistedData.get(symbol));
+        }
+    }
+
+    void hoist(ParseTree ctx, ArrobaInterpreter interpreter) {
+        hoist(ctx, interpreter, false);
     }
 
     public ArrobaDatum invoke(ArrobaDatum arg) {
@@ -41,5 +68,10 @@ public class ArrobaFunction extends ArrobaDatum {
             System.out.println("There are " + interpreter.scopes.size() + " total scopes.");
             interpreter.dumpScopes();*/
         }
+    }
+
+    @Override
+    public String toString() {
+        return "<Function>";
     }
 }

@@ -64,8 +64,7 @@ public class ArrobaArray extends ArrobaDatum {
                     return new ArrobaArray(results);
                 }
 
-                System.err.println("array.all expects argument 1 to be a function");
-                return null;
+                return new ArrobaException("array.all expects argument 1 to be a function");
             }
 
             @Override
@@ -128,8 +127,7 @@ public class ArrobaArray extends ArrobaDatum {
             return items.get(((ArrobaNumber) index).value.intValue());
         }
 
-        System.err.println("Given indexer is not a number: " + index.toString());
-        return null;
+        return new ArrobaException("Given indexer is not a number: " + index.toString());
     }
 
     @Override

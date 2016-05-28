@@ -12,8 +12,7 @@ public class CatFunction extends ArrobaFunction {
             return new CatFunctionStub(args.get(0));
         }
 
-        System.err.println("cat expects at least one argument");
-        return null;
+        return new ArrobaException("cat expects at least one argument");
     }
 
     @Override
@@ -43,20 +42,17 @@ class CatFunctionStub extends ArrobaFunction {
                 } else if (item instanceof ArrobaString) {
                     return new ArrobaPureString(parent.toString() + item.toString());
                 } else {
-                    System.err.println("Numbers can only be joined with strings or other numbers");
-                    return null;
+                    return new ArrobaException("Numbers can only be joined with strings or other numbers");
                 }
             } else if (parent instanceof ArrobaArray) {
                 ((ArrobaArray) parent).items.add(item);
                 return parent;
             } else {
-                System.err.println("Expression does not support concatenation: " + parent.toString());
-                return null;
+                return new ArrobaException("Expression does not support concatenation: " + parent.toString());
             }
         }
 
-        System.err.println("Concatenator expects at least one argument");
-        return null;
+        return new ArrobaException("Concatenator expects at least one argument");
     }
 
     @Override

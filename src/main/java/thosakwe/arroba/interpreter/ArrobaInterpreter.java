@@ -32,11 +32,13 @@ public class ArrobaInterpreter extends Scoped {
         globalScope.symbols.put("any", new AnyFunction());
         globalScope.symbols.put("File", new FileFunction());
         globalScope.symbols.put("Directory", new DirectoryFunction());
-        globalScope.symbols.put("Socket", new DirectoryFunction());
+        globalScope.symbols.put("Socket", new SocketFunction());
         globalScope.symbols.put("Task", new TaskFunction());
+        globalScope.symbols.put("Process", new ProcessTask());
         globalScope.symbols.put("rgx", new RgxFunction());
         globalScope.symbols.put("cat", new CatFunction());
         globalScope.symbols.put("Exception", new ExceptionFunction());
+        globalScope.symbols.put("Event", new EventFunction());
         globalScope.symbols.put("quit", new ArrobaFunction() {
             @Override
             public ArrobaDatum invoke(List<ArrobaDatum> args) {
@@ -95,7 +97,7 @@ public class ArrobaInterpreter extends Scoped {
             if (parent != null) {
                 return parent.resolve(ctx.ID().getText());
             } else {
-                System.err.println("Invalid expression: " + ctx.expr().getText());
+                return new ArrobaException("Invalid expression: " + ctx.expr().getText());
             }
         } else if (expr instanceof ArrobaParser.StringExprContext) {
             ArrobaParser.StringExprContext ctx = (ArrobaParser.StringExprContext) expr;
@@ -111,44 +113,13 @@ public class ArrobaInterpreter extends Scoped {
 
             return new ArrobaNumber(truth ? 1.0 : 0.0);
         } else if (expr instanceof ArrobaParser.FunctionExprContext) {
-
             ArrobaFunction result = new ArrobaFullFunction((ArrobaParser.FunctionExprContext) expr, this);
-
-            ClosureHoister hoister = new ClosureHoister(true);
-            hoister.visitFunctionExpr((ArrobaParser.FunctionExprContext) expr);
-
-            // Copy necessary data to the given function's scope...
-            for (String symbol : hoister.externalSymbols) {
-                System.out.println("Hoisting " + symbol + " -> " + value(symbol));
-                result.hoistedData.put(symbol, value(symbol));
-            }
-
-            for (String symbol : result.hoistedData.keySet()) {
-                value(symbol, result.hoistedData.get(symbol));
-            }
-
+            result.hoist(expr, this);
             return result;
         } else if (expr instanceof ArrobaParser.InlineFunctionExprContext) {
             ArrobaFunction result = new ArrobaInlineFunction((ArrobaParser.InlineFunctionExprContext) expr, this);
-
-            ClosureHoister hoister = new ClosureHoister(true);
-            hoister.visitInlineFunctionExpr((ArrobaParser.InlineFunctionExprContext) expr);
-
-            // Copy necessary data to the given function's scope...
-            for (String symbol : hoister.externalSymbols) {
-                System.out.println("Hoisting " + symbol + " -> " + value(symbol));
-                result.hoistedData.put(symbol, value(symbol));
-            }
-
-            for (String symbol : result.hoistedData.keySet()) {
-                if (result.hoistedData.get(symbol) != null)
-                    value(symbol, result.hoistedData.get(symbol));
-            }
-
+            result.hoist(expr, this, true);
             return result;
-        } else if (expr instanceof ArrobaParser.InlineFunctionExprContext) {
-            return new ArrobaInlineFunction((ArrobaParser.InlineFunctionExprContext) expr, this);
-
         } else if (expr instanceof ArrobaParser.MathExprContext) {
             return resolveMathExpr((ArrobaParser.MathExprContext) expr);
         } else if (expr instanceof ArrobaParser.NumExprContext) {
@@ -159,6 +130,16 @@ public class ArrobaInterpreter extends Scoped {
             List<ArrobaParser.ExprContext> exprs = ((ArrobaParser.AwaitExprContext) expr).expr();
             ArrobaDatum target = visitExpr(((ArrobaParser.AwaitExprContext) expr).target);
 
+            if (target instanceof ArrobaFunction) {
+                List<ArrobaDatum> args = new ArrayList<>();
+
+                for (int i = 1; i < exprs.size(); i++) {
+                    args.add(visitExpr(exprs.get(i)));
+                }
+
+                target = ((ArrobaFunction) target).invoke(args);
+            }
+
             if (target instanceof ArrobaTask) {
                 List<ArrobaDatum> args = new ArrayList<>();
 
@@ -166,17 +147,15 @@ public class ArrobaInterpreter extends Scoped {
                     args.add(visitExpr(exprs.get(i)));
                 }
 
-                return ((ArrobaTask) target).yield().invoke(args);
+                ArrobaFunction yielder = (ArrobaFunction) target.members.get("yield");
+                return yielder.invoke(args);
             }
 
-            System.err.println("You can only await tasks.");
+            String message = "You can only await tasks.";
 
             if (target == null)
-                System.err.println("Null values cannot be awaited!");
-            else System.err.println("Instead, you tried to await this: " + target.toString());
-
-
-            return null;
+                return new ArrobaException(message + " Null values cannot be awaited!");
+            else return new ArrobaException(message + " Instead, you tried to await this: " + target.toString());
         } else if (expr instanceof ArrobaParser.IndexExprContext) {
             ArrobaParser.IndexExprContext ctx = (ArrobaParser.IndexExprContext) expr;
             ArrobaDatum target = visitExpr(ctx.target);
@@ -185,8 +164,7 @@ public class ArrobaInterpreter extends Scoped {
                 ArrobaDatum index = visitExpr(ctx.index);
                 return ((ArrobaArray) target).resolveIndex(index);
             } else {
-                System.err.println("Given expression is not an array: " + ctx.target.getText());
-                return null;
+                return new ArrobaException("Given expression is not an array: " + ctx.target.getText());
             }
         } else if (expr instanceof ArrobaParser.InvocationExprContext) {
             ArrobaDatum target = visitExpr(((ArrobaParser.InvocationExprContext) expr).target);
@@ -204,7 +182,7 @@ public class ArrobaInterpreter extends Scoped {
                 exitLastScope();
                 return result;
             } else {
-                System.err.println(((ArrobaParser.InvocationExprContext) expr).target.getText() + " is not a function");
+                return new ArrobaException(((ArrobaParser.InvocationExprContext) expr).target.getText() + " is not a function");
             }
         }
 
@@ -263,39 +241,27 @@ public class ArrobaInterpreter extends Scoped {
         System.out.println("right: " + right);*/
 
         if (ctx.PLUS() != null) {
-
-
             if (leftValue instanceof ArrobaArray) {
                 ((ArrobaArray) leftValue).items.add(rightValue);
                 return leftValue;
             } else if (leftValue instanceof ArrobaString || rightValue instanceof ArrobaString) {
-                //return new ArrobaPureString(leftValue.toString() + rightValue.toString());
+                return new ArrobaPureString(leftValue.toString() + rightValue.toString());
+            } else return ArrobaNumber.From(left.value + right.value);
+        } else if (ctx.MINUS() != null) {
+            if (leftValue instanceof ArrobaArray) {
+                ((ArrobaArray) leftValue).items.remove(rightValue);
+                return leftValue;
+            }
 
-                if (leftValue instanceof ArrobaString || rightValue instanceof ArrobaString) {
-                    return new ArrobaPureString(leftValue.toString() + rightValue.toString());
-                } else if (leftValue instanceof ArrobaArray) {
-                    ((ArrobaArray) leftValue).items.add(rightValue);
-                    return leftValue;
-
-                }
-
-                return ArrobaNumber.From(left.value + right.value);
-            } else if (ctx.MINUS() != null) {
-                if (leftValue instanceof ArrobaArray) {
-                    ((ArrobaArray) leftValue).items.remove(rightValue);
-                    return leftValue;
-                }
-
-                return ArrobaNumber.From(left.value - right.value);
-            } else if (ctx.TIMES() != null)
-                return ArrobaNumber.From(left.value * right.value);
-            else if (ctx.DIVIDE() != null)
-                return ArrobaNumber.From(left.value / right.value);
-            else if (ctx.CARET() != null)
-                return ArrobaNumber.From(Math.pow(left.value, right.value));
-            else if (ctx.MODULO() != null)
-                return ArrobaNumber.From(left.value % right.value);
-        }
+            return ArrobaNumber.From(left.value - right.value);
+        } else if (ctx.TIMES() != null)
+            return ArrobaNumber.From(left.value * right.value);
+        else if (ctx.DIVIDE() != null)
+            return ArrobaNumber.From(left.value / right.value);
+        else if (ctx.CARET() != null)
+            return ArrobaNumber.From(Math.pow(left.value, right.value));
+        else if (ctx.MODULO() != null)
+            return ArrobaNumber.From(left.value % right.value);
 
         return null;
     }
@@ -317,7 +283,7 @@ public class ArrobaInterpreter extends Scoped {
                 target.setMember(expr.ID().getText(), visitExpr(right));
                 return target.resolve(expr.ID().getText());
             } else {
-                System.err.println("Invalid expression: " + expr.getText());
+                return new ArrobaException("Invalid expression: " + expr.getText());
             }
         } else {
             ArrobaDatum target = visitExpr(left);

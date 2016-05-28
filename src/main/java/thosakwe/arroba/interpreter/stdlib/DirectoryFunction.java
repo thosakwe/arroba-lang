@@ -15,8 +15,7 @@ public class DirectoryFunction extends ArrobaFunction {
             return new ArrobaDirectory(path);
         }
 
-        System.err.println("Directory expects argument 1 to be a string");
-        return null;
+        return new ArrobaException("Directory expects argument 1 to be a string");
     }
 
     @Override
@@ -40,7 +39,7 @@ class ArrobaDirectory extends ArrobaDatum {
                     try {
                         result = dir.mkdir();
                     } catch (Exception exc) {
-                        System.err.println("Could not create dir: " + dir.getPath());
+                        return new ArrobaException("Could not create dir: " + dir.getPath());
                     }
 
                     return new ArrobaNumber(result ? 1.0 : 0.0);
@@ -59,7 +58,7 @@ class ArrobaDirectory extends ArrobaDatum {
                     try {
                         result = dir.delete();
                     } catch (Exception exc) {
-                        System.err.println("Could not delete dir: " + dir.getPath());
+                        return new ArrobaException("Could not delete dir: " + dir.getPath());
                     }
 
                     return new ArrobaNumber(result ? 1.0 : 0.0);
@@ -82,6 +81,7 @@ class ArrobaDirectory extends ArrobaDatum {
                     return "<Native Function> dir.exists()";
                 }
             });
+            members.put("isDir", ArrobaNumber.True());
             members.put("path", new ArrobaPureString(dir.getPath()));
             members.put("ls", new ArrobaFunction() {
                 @Override
@@ -90,8 +90,7 @@ class ArrobaDirectory extends ArrobaDatum {
                     File[] files = dir.listFiles();
 
                     if (files == null) {
-                        System.err.println("Could not list directory: " + dir.getPath());
-                        return null;
+                        return new ArrobaException("Could not list directory: " + dir.getPath());
                     }
 
                     for (File file : files) {
@@ -112,11 +111,9 @@ class ArrobaDirectory extends ArrobaDatum {
                 @Override
                 public ArrobaDatum invoke(List<ArrobaDatum> args) {
                     if (args.isEmpty()) {
-                        System.err.println("dir.write expects 1 argument");
-                        return null;
+                        return new ArrobaException("dir.write expects 1 argument");
                     } else if (!(args.get(0) instanceof ArrobaString)) {
-                        System.err.println("dir.resolve expects argument 1 to be a string");
-                        return null;
+                        return new ArrobaException("dir.resolve expects argument 1 to be a string");
                     }
 
                     File targetFile = new File(dir, args.get(0).toString());
@@ -129,7 +126,7 @@ class ArrobaDirectory extends ArrobaDatum {
                 }
             });
         } catch (Exception exc) {
-            System.err.println("Could not open dir: " + path.toString());
+            System.err.println("Warning: could not open dir: " + path.toString());
         }
     }
 

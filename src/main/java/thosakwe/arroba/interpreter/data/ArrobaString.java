@@ -59,8 +59,7 @@ public class ArrobaString extends ArrobaDatum {
                     return new ArrobaArray(result);
                 }
 
-                System.err.println("string.split expects argument 1 to be a string");
-                return null;
+                return new ArrobaException("string.split expects argument 1 to be a string");
             }
 
             @Override
@@ -85,11 +84,16 @@ public class ArrobaString extends ArrobaDatum {
         super(source);
 
         this.text = (text == null) ? "" : text;
-        this.text = text
-                .replaceAll(Matcher.quoteReplacement("\\\""), "\"")
-                .replaceAll(Matcher.quoteReplacement("\\n"), "\n")
-                .replaceAll(Matcher.quoteReplacement("\\b"), "\b")
-                .replaceAll(Matcher.quoteReplacement("\\r"), "\r");
+
+        if (!(this instanceof ArrobaPureString)) {
+            this.text = this.text
+                    .replaceAll(Matcher.quoteReplacement("\\\""), "\"")
+                    .replaceAll(Matcher.quoteReplacement("\\n"), "\n")
+                    .replaceAll(Matcher.quoteReplacement("\\b"), "\b")
+                    .replaceAll(Matcher.quoteReplacement("\\t"), "\t")
+                    .replaceAll(Matcher.quoteReplacement("\\r"), "\r");
+        }
+
         this.interpreter = interpreter;
         addLen();
     }

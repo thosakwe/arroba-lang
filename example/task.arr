@@ -4,7 +4,7 @@
 task = Task((x) => x + 2)
 
 # You can add a callback.
-task.then(fn(x) {
+task.ok(fn(x) {
     print("Asynchronously: " -> cat(x))
 })
 
@@ -13,8 +13,6 @@ task.then(fn(x) {
 
 
 task.fail(printErr)
-
-task.catch(printErr)
 
 
 # Fire the task, asynchronously.
@@ -28,6 +26,9 @@ task.run(418)
 
 # You can run the task and have it block.
 # Just use yield.
+#
+# IMPORTANT:
+# A task run via yield will be run on the current thread, SYNCHRONOUSLY.
 
 task = Task((x) => x * 5)
 

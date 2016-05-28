@@ -1,10 +1,7 @@
 package thosakwe.arroba.interpreter.stdlib;
 
 import thosakwe.arroba.interpreter.ArrobaFunction;
-import thosakwe.arroba.interpreter.data.ArrobaDatum;
-import thosakwe.arroba.interpreter.data.ArrobaNumber;
-import thosakwe.arroba.interpreter.data.ArrobaPureString;
-import thosakwe.arroba.interpreter.data.ArrobaString;
+import thosakwe.arroba.interpreter.data.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,8 +19,7 @@ public class FileFunction extends ArrobaFunction {
             return new ArrobaFile(path);
         }
 
-        System.err.println("File expects argument 1 to be a string");
-        return null;
+        return new ArrobaException("File expects argument 1 to be a string");
     }
 
     @Override
@@ -53,7 +49,7 @@ class ArrobaFile extends ArrobaDatum {
                     try {
                         result = file.createNewFile();
                     } catch (Exception exc) {
-                        System.err.println("Could not create file: " + file.getPath());
+                        return new ArrobaException("Could not create file: " + file.getPath());
                     }
 
                     return new ArrobaNumber(result ? 1.0 : 0.0);
@@ -72,7 +68,7 @@ class ArrobaFile extends ArrobaDatum {
                     try {
                         result = file.delete();
                     } catch (Exception exc) {
-                        System.err.println("Could not delete file: " + file.getPath());
+                        return new ArrobaException("Could not delete file: " + file.getPath());
                     }
 
                     return new ArrobaNumber(result ? 1.0 : 0.0);
@@ -95,6 +91,7 @@ class ArrobaFile extends ArrobaDatum {
                     return "<Native Function> file.exists()";
                 }
             });
+            members.put("isDir", ArrobaNumber.False());
             members.put("path", new ArrobaPureString(file.getPath()));
             members.put("read", new ArrobaFunction() {
                 @Override
@@ -102,8 +99,7 @@ class ArrobaFile extends ArrobaDatum {
                     try {
                         return new ArrobaPureString(readFile(file.getPath(), Charset.defaultCharset()));
                     } catch (Exception exc) {
-                        System.err.println(exc.toString());
-                        return null;
+                        return new ArrobaException(exc);
                     }
                 }
 
@@ -116,8 +112,7 @@ class ArrobaFile extends ArrobaDatum {
                 @Override
                 public ArrobaDatum invoke(List<ArrobaDatum> args) {
                     if (args.isEmpty()) {
-                        System.err.println("file.write expects 1 argument");
-                        return null;
+                        return new ArrobaException("file.write expects 1 argument");
                     }
 
                     Boolean result = false;
@@ -127,7 +122,7 @@ class ArrobaFile extends ArrobaDatum {
                             //noinspection ResultOfMethodCallIgnored
                             file.createNewFile();
                         } catch (Exception exc) {
-                            System.err.println("Cannot create file " + file.getPath());
+                            return new ArrobaException("Cannot create file " + file.getPath());
                         }
                     }
 
@@ -138,7 +133,7 @@ class ArrobaFile extends ArrobaDatum {
                             printStream.close();
                             result = true;
                         } catch (Exception exc) {
-                            System.err.println("Cannot write to " + file.getPath());
+                            return new ArrobaException("Cannot write to " + file.getPath());
                         }
                     }
 
@@ -151,7 +146,7 @@ class ArrobaFile extends ArrobaDatum {
                 }
             });
         } catch (Exception exc) {
-            System.err.println("Could not open file: " + path.toString());
+            System.err.println("Warning: could not open file: " + path.toString());
         }
     }
 

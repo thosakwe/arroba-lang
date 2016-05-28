@@ -4,24 +4,28 @@ todos = [
     "More tests",
     # "Directories",
     # "Array add/remove, also via operators",
-    "Linter? Formatter?",
+    # "Linter? Formatter?",
     "Compile to LLVM",
     "Sockets",
     # "Concurrency (A.K.A. \"Tasks\")",
-    "While, better for loops, maybe...",
-    "Closures should preserve variables from scope",
+    # "While, better for loops, maybe...",
+    # "Closures should preserve variables from scope",
+    # "Error handling",
+    "Run process task should use events",
     # "Error handling",
     "Stack trace",
-    "Run process task",
-    "Error handling",
-    "Stack trace",
+    "Null???",
+    "Chain tasks",
+    "UDP sockets",
+    "Crypto?",
+    "JSON maybe",
     # "Equals",
     "And much more..."
 ]
 
 pluralize = fn(num, singular, plural) {
     if (num == 1) {
-        ret num -> cat(" ") -> cat(singular)
+        ret num + cat(" ") -> cat(singular)
     } else ret num -> cat(" ") -> cat(plural)
 }
 

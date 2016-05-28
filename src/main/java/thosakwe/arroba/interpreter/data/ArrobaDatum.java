@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class ArrobaDatum {
     private ArrobaParser.ExprContext source;
-    protected Map<String, ArrobaDatum> members = new HashMap<>();
+    public Map<String, ArrobaDatum> members = new HashMap<>();
     public int tabCount = 0;
 
     public ArrobaDatum() {
@@ -36,8 +36,7 @@ public class ArrobaDatum {
             System.out.println("Symbol: " + symbol);
         }*/
 
-        System.err.println("Could not resolve member: " + memberName);
-        return null;
+        return new ArrobaException("Could not resolve member: " + memberName);
     }
 
     public ArrobaDatum setMember(String memberName, ArrobaDatum value) {
@@ -52,8 +51,7 @@ public class ArrobaDatum {
 
                 if (i < parts.length - 1) {
                     if (next == null) {
-                        System.err.println("Could not resolve member: " + parts[i]);
-                        return null;
+                        return new ArrobaException("Could not resolve member: " + parts[i]);
                     }
 
                     parent = next;
