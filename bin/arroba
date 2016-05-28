@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+cd `dirname $0`
+SCRIPTDIR=`pwd`
+cd -
+java -jar "$SCRIPTDIR/../out/artifacts/arroba_jar/arroba.jar" $@
