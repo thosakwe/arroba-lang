@@ -2,6 +2,7 @@ package thosakwe.arroba.interpreter.stdlib;
 
 import thosakwe.arroba.antlr.ArrobaParser;
 import thosakwe.arroba.cli.AstGen;
+import thosakwe.arroba.cli.Main;
 import thosakwe.arroba.interpreter.ArrobaFunction;
 import thosakwe.arroba.interpreter.ArrobaInterpreter;
 import thosakwe.arroba.interpreter.data.ArrobaArray;
@@ -10,15 +11,21 @@ import thosakwe.arroba.interpreter.data.ArrobaException;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ImportFunction extends ArrobaFunction {
     ArrobaInterpreter interpreter;
-    private File incDir = new File("./inc").getCanonicalFile();
+    private File incDir;
 
-    public ImportFunction(ArrobaInterpreter interpreter) throws IOException {
+    public ImportFunction(ArrobaInterpreter interpreter) throws IOException, URISyntaxException {
         this.interpreter = interpreter;
+
+        incDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+        incDir = incDir.getParentFile();
+        incDir = new File(incDir, "../inc");
+        //System.out.println(incDir.getAbsolutePath());
     }
 
     private String makeImportPath(String importer) {
@@ -38,7 +45,7 @@ public class ImportFunction extends ArrobaFunction {
                 String importer = args.get(0).toString();
                 if (importer.equals("<util>")) {
                     return new ArrobaUtil();
-                } else if(importer.equals("<json>")) {
+                } else if (importer.equals("<json>")) {
                     return new ArrobaJSON();
                 }
 

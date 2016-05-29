@@ -7,6 +7,7 @@ import thosakwe.arroba.interpreter.ArrobaInterpreter;
 import thosakwe.arroba.interpreter.data.ArrobaArray;
 import thosakwe.arroba.interpreter.data.ArrobaDatum;
 import thosakwe.arroba.interpreter.data.ArrobaException;
+import thosakwe.arroba.interpreter.data.ArrobaString;
 import thosakwe.arroba.interpreter.stdlib.PrintFunction;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public class Main {
             try {
                 ArrobaParser parser = AstGen.makeParserFromText(scanner.nextLine());
                 ArrobaDatum result = interpreter.visitCompilationUnit(parser.compilationUnit());
-                dumpResult(result, print);
+                dumpResult(result, print, true);
             } catch (Exception exc) {
                 System.err.println("Error: " + exc.getMessage());
 
@@ -71,7 +72,7 @@ public class Main {
         }
     }
 
-    private static void dumpResult(ArrobaDatum result, PrintFunction print) {
+    private static void dumpResult(ArrobaDatum result, PrintFunction print, Boolean printLine) {
         if (result == null) {
             System.out.println("<null>");
         } else if (result instanceof ArrobaArray) {
@@ -87,6 +88,34 @@ public class Main {
             System.out.println("]");
         } else if (result instanceof ArrobaException) {
             System.err.println(result);
-        } else print.invoke(result);
+        } else if (result instanceof ArrobaString){
+            System.out.println("\"" + result + "\"");
+        } else {
+            print.invoke(result);
+            if (false) {
+                if (result.members.size() == 0) {
+                    System.out.println("{}");
+                    return;
+                }
+                System.out.print("{");
+
+                int k = 0;
+                for (String key : result.members.keySet()) {
+
+                    if (k > 0)
+                        System.out.print(", ");
+                    System.out.print(key + ": ");
+
+                    ArrobaDatum found = result.members.get(key);
+                    dumpResult(found, print, false);
+                    k++;
+                }
+
+                System.out.print("}");
+
+                if (printLine)
+                    System.out.println();
+            }
+        }
     }
 }

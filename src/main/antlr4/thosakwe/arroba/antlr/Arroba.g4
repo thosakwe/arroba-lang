@@ -28,6 +28,7 @@ expr:
     | target=expr PAREN_L ((expr COMMA)* expr)? PAREN_R #InvocationExpr
     | expr (CARET | MODULO | TIMES | DIVIDE | PLUS | MINUS ) expr #MathExpr
     | left=expr booleanOperator right=expr #BoolExpr
+    | RAW_STRING #RawStringExpr
     | STRING #StringExpr
     | target=expr SQUARE_L index=expr SQUARE_R #IndexExpr
     | SQUARE_L ((expr COMMA)* expr)? SQUARE_R #ArrayExpr
@@ -35,6 +36,7 @@ expr:
     | FN paramSpec CURLY_L stmt* CURLY_R #FunctionExpr
     | paramSpec ARR_FAT expr #InlineFunctionExpr
     | expr ARR_R expr #ArrowRightExpr
+    | REGEX_LITERAL flags+=('g' | 'i' | 'm' | 'u' | 'c')* #RegexLiteralExpr
     | PAREN_L expr PAREN_R #NestedExpr
 ;
 
@@ -104,5 +106,7 @@ DBL: MINUS? [0-9]+ DOT [0-9]+;
 HEX: '0x' [a-zA-Z0-9]+;
 INT: MINUS? [0-9]+;
 fragment ESCAPED: '\\"' | '\\r' | '\\n';
+RAW_STRING: 'r"' (ESCAPED | ~('\n'|'\r'))*? '"';
 STRING: '"' (ESCAPED | ~('\n'|'\r'))*? '"';
+REGEX_LITERAL: '/' ~'/'+ '/';
 ID: [a-zA-Z_] [a-zA-Z0-9_]*;

@@ -20,7 +20,7 @@ public class ArrobaInterpreter extends Scoped {
         super();
         try {
             globalScope.symbols.put("import", new ImportFunction(this));
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.println("Could not find include dir. Standard imports will not work.");
         }
         globalScope.symbols.put("eval", new EvalFunction(this));
@@ -99,7 +99,11 @@ public class ArrobaInterpreter extends Scoped {
             } else {
                 return new ArrobaException("Invalid expression: " + ctx.expr().getText());
             }
-        } else if (expr instanceof ArrobaParser.StringExprContext) {
+        } else if (expr instanceof ArrobaParser.RawStringExprContext) {
+            ArrobaParser.RawStringExprContext ctx = (ArrobaParser.RawStringExprContext) expr;
+            String text = ctx.getText().replaceAll("(^r\")|(\"$)", "");
+            return new ArrobaPureString(text);
+        }else if (expr instanceof ArrobaParser.StringExprContext) {
             ArrobaParser.StringExprContext ctx = (ArrobaParser.StringExprContext) expr;
             String text = ctx.getText().replaceAll("(^\")|(\"$)", "");
             return new ArrobaString(text, ctx, this);
@@ -166,6 +170,8 @@ public class ArrobaInterpreter extends Scoped {
             } else {
                 return new ArrobaException("Given expression is not an array: " + ctx.target.getText());
             }
+        } else if(expr instanceof ArrobaParser.RegexLiteralExprContext) {
+            return new ArrobaLiteralMatcher((ArrobaParser.RegexLiteralExprContext) expr);
         } else if (expr instanceof ArrobaParser.InvocationExprContext) {
             ArrobaDatum target = visitExpr(((ArrobaParser.InvocationExprContext) expr).target);
             if (target instanceof ArrobaFunction) {
