@@ -2,7 +2,6 @@
 
 # Contents
 
-*   [About](about.md)
 *   [Getting Started](getting-started.md)
 *   [Primitives](primitives.md)
 *   [Functions](functions.md)

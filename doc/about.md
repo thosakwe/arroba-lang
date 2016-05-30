@@ -1,12 +1,3 @@
-# arroba-lang
-
-That really cool language, yeah.
-
-    "Hello, world!" -> print
-
-# Documentation
-[Click here.](doc/index.md)
-
 # About
 
 Arroba was originally conceived out of boredom, but I realized it has a
