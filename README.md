@@ -2,4 +2,4 @@
     "Hello, world!" -> print
 
 # Documentation
-[Click here.](docs/index.md)
+[Click here.](doc/index.md)
