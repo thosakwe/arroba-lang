@@ -1,12 +1,27 @@
 # Modularity
 
+# Imports
+We can import other code! Just call `import`. No need to include `.arr`.
+***IMPORT*ANT: Imports are run relative to the working directory.**
+
+```arroba
+// Import a native module, found in inc/
+Math = import("<math>")
+
+// Import a local file, "stuff.arr"
+
+Stuff = import("stuff")
+```
+
+# Exporting
+
 Every Arroba script is a function in itself. Thus, we can export a
 value to be used in other scripts.
 
 JavaScript users will recognize this as a construct similar to
 `module.exports`.
 
-## Example
+## Exporting Example
 
 We can define a class in a separate file. This allows us to re-use the
 same code in multiple places, though we only write it once.
