@@ -1,7 +1,12 @@
 # An Arroba REPL... Written in Arroba.
 
 while (true) {
-    print(eval(input("arroba>")))
+    try {
+        local:result = eval(input("arroba>"))
+        print(result)
+    } catch (exc) {
+        printErr(exc)
+    }
 }
 
 ret 0

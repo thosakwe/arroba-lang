@@ -5,4 +5,9 @@ public class PrintErrFunction extends PrintFunction {
         super();
         output = System.err;
     }
+
+    @Override
+    public String toString() {
+        return "<Native Function> printErr(args)";
+    }
 }

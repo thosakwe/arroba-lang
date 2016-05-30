@@ -125,9 +125,17 @@ public class ArrobaArray extends ArrobaDatum {
     public ArrobaDatum resolveIndex(ArrobaDatum index) {
         if (index instanceof ArrobaNumber) {
             return items.get(((ArrobaNumber) index).value.intValue());
+        } else if (index instanceof ArrobaString) {
+            String symbol = index.toString();
+            ArrobaDatum resolved = resolve(symbol);
+
+            if (resolved != null)
+                return resolved;
+
+            return new ArrobaException("Given array does not contain symbol \"" + symbol + "\".");
         }
 
-        return new ArrobaException("Given indexer is not a number: " + index.toString());
+        return new ArrobaException("Given indexer is not a number or string: " + index.toString());
     }
 
     @Override

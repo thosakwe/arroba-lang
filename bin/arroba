@@ -3,4 +3,5 @@
 cd `dirname $0`
 SCRIPTDIR=`pwd`
 cd -
+# SCRIPTDIR="$(dirname "$(dirname "$(realpath "$0")")")"
 java -jar "$SCRIPTDIR/../target/arroba-1.0-SNAPSHOT.jar" $@

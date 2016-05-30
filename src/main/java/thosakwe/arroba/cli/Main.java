@@ -88,7 +88,7 @@ public class Main {
             System.out.println("]");
         } else if (result instanceof ArrobaException) {
             System.err.println(result);
-        } else if (result instanceof ArrobaString){
+        } else if (false && result instanceof ArrobaString){
             System.out.println("\"" + result + "\"");
         } else {
             print.invoke(result);

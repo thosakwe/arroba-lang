@@ -91,6 +91,7 @@ public class ArrobaString extends ArrobaDatum {
                     .replaceAll(Matcher.quoteReplacement("\\n"), "\n")
                     .replaceAll(Matcher.quoteReplacement("\\b"), "\b")
                     .replaceAll(Matcher.quoteReplacement("\\t"), "\t")
+                    .replaceAll("\\\\", "\\")
                     .replaceAll(Matcher.quoteReplacement("\\r"), "\r");
         }
 

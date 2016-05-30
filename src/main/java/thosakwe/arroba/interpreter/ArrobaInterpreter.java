@@ -103,7 +103,7 @@ public class ArrobaInterpreter extends Scoped {
             ArrobaParser.RawStringExprContext ctx = (ArrobaParser.RawStringExprContext) expr;
             String text = ctx.getText().replaceAll("(^r\")|(\"$)", "");
             return new ArrobaPureString(text);
-        }else if (expr instanceof ArrobaParser.StringExprContext) {
+        } else if (expr instanceof ArrobaParser.StringExprContext) {
             ArrobaParser.StringExprContext ctx = (ArrobaParser.StringExprContext) expr;
             String text = ctx.getText().replaceAll("(^\")|(\"$)", "");
             return new ArrobaString(text, ctx, this);
@@ -170,11 +170,23 @@ public class ArrobaInterpreter extends Scoped {
             } else {
                 return new ArrobaException("Given expression is not an array: " + ctx.target.getText());
             }
-        } else if(expr instanceof ArrobaParser.RegexLiteralExprContext) {
+        } else if (expr instanceof ArrobaParser.RegexLiteralExprContext) {
             return new ArrobaLiteralMatcher((ArrobaParser.RegexLiteralExprContext) expr);
         } else if (expr instanceof ArrobaParser.InvocationExprContext) {
             ArrobaDatum target = visitExpr(((ArrobaParser.InvocationExprContext) expr).target);
+            ArrobaFunction run = null;
+
             if (target instanceof ArrobaFunction) {
+                run = (ArrobaFunction) target;
+            } else {
+                ArrobaDatum callee = target.resolve("call");
+
+                if (callee instanceof ArrobaFunction) {
+                    run = (ArrobaFunction) callee;
+                }
+            }
+
+            if (run != null) {
                 createChildScope();
                 List<ArrobaParser.ExprContext> exprs = ((ArrobaParser.InvocationExprContext) expr).expr();
                 List<ArrobaDatum> args = new ArrayList<>();
@@ -184,7 +196,7 @@ public class ArrobaInterpreter extends Scoped {
                     args.add(visitExpr(exprContext));
                 }
 
-                ArrobaDatum result = ((ArrobaFunction) target).invoke(args);
+                ArrobaDatum result = run.invoke(args);
                 exitLastScope();
                 return result;
             } else {

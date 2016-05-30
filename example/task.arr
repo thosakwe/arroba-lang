@@ -18,12 +18,6 @@ task.fail(printErr)
 # Fire the task, asynchronously.
 task.run(418)
 
-
-# Tasks are single-use only objects.
-# They cannot be re-used.
-
-
-
 # You can run the task and have it block.
 # Just use yield.
 #
