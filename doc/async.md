@@ -7,7 +7,7 @@ it in a `Task`.
 Callbacks and error handlers can be wired to a task via `ok` and `fail`.
 Calling `run` will start the work in a new thread, without blocking.
 
-```
+```arroba
 local:sayHi = Task(() => print("Hello, world!"))
 
 sayHi.ok(fn(msg) {
@@ -26,7 +26,7 @@ instead.
 
 We also have a nice syntactic sugar available, `await`...
 
-```
+```arroba
 task = Task((x) => x * 2)
 
 local:leet = task.yield(4)
@@ -46,7 +46,7 @@ You can augment the default `Task` class by importing the `"<task>"` module.
 This exposes `resolve` and `reject` functions similar to those of JavaScript
 `Promises`.
 
-```
+```arroba
 Task = import("<task>")
 
 local:three = await Task.resolve(3)

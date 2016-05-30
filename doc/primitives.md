@@ -18,8 +18,14 @@ if a number is an integer, then its string representation is simply the integer 
 
 Example:
 
-```
+```arroba
 local:str = r"This backslash is not escaped \"
 ```
 
 And yes, functions are first-class objects.
+
+# any()
+One of the most important functions in Arroba, this function returns an
+empty datum, and nothing else.
+
+It is equivalent to a `{}` literal in JavaScript.
