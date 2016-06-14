@@ -18,4 +18,4 @@ Linux/Mac:
 
 Windows:
 
-    .\arroba -i todo.arr
+    arroba -i todo.arr
