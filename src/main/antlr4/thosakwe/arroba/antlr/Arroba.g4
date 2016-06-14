@@ -33,8 +33,8 @@ expr:
     | target=expr SQUARE_L index=expr SQUARE_R #IndexExpr
     | SQUARE_L ((expr COMMA)* expr)? SQUARE_R #ArrayExpr
     | LOCAL COLON ID #LocalExpr
-    | FN paramSpec CURLY_L stmt* CURLY_R #FunctionExpr
-    | paramSpec ARR_FAT expr #InlineFunctionExpr
+    | FN ID? paramSpec CURLY_L stmt* CURLY_R #FunctionExpr
+    | (FN ID?)? paramSpec ARR_FAT expr #InlineFunctionExpr
     | expr ARR_R expr #ArrowRightExpr
     | REGEX_LITERAL flags+=('g' | 'i' | 'm' | 'u' | 'c')* #RegexLiteralExpr
     | PAREN_L expr PAREN_R #NestedExpr

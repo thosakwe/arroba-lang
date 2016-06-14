@@ -119,10 +119,19 @@ public class ArrobaInterpreter extends Scoped {
         } else if (expr instanceof ArrobaParser.FunctionExprContext) {
             ArrobaFunction result = new ArrobaFullFunction((ArrobaParser.FunctionExprContext) expr, this);
             result.hoist(expr, this);
+
+            if(((ArrobaParser.FunctionExprContext) expr).ID() != null) {
+                value(((ArrobaParser.FunctionExprContext) expr).ID().getText(), result);
+            }
+
             return result;
         } else if (expr instanceof ArrobaParser.InlineFunctionExprContext) {
             ArrobaFunction result = new ArrobaInlineFunction((ArrobaParser.InlineFunctionExprContext) expr, this);
             result.hoist(expr, this, true);
+            if(((ArrobaParser.InlineFunctionExprContext) expr).ID() != null) {
+                value(((ArrobaParser.InlineFunctionExprContext) expr).ID().getText(), result);
+            }
+
             return result;
         } else if (expr instanceof ArrobaParser.MathExprContext) {
             return resolveMathExpr((ArrobaParser.MathExprContext) expr);
