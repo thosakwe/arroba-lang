@@ -1,5 +1,6 @@
 package thosakwe.arroba.cli;
 
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.commons.cli.*;
 import thosakwe.arroba.antlr.ArrobaParser;
 import thosakwe.arroba.interpreter.ArrobaFunction;
@@ -9,6 +10,7 @@ import thosakwe.arroba.interpreter.data.ArrobaDatum;
 import thosakwe.arroba.interpreter.data.ArrobaException;
 import thosakwe.arroba.interpreter.data.ArrobaString;
 import thosakwe.arroba.interpreter.stdlib.PrintFunction;
+import thosakwe.arroba.js.JsTranspiler;
 
 import java.util.List;
 import java.util.Scanner;
@@ -36,9 +38,13 @@ public class Main {
         ArrobaParser.CompilationUnitContext ast = AstGen.makeAst(cliOptions.getOptionValue('i'));
 
         if (ast != null) {
-            ArrobaInterpreter interpreter = new ArrobaInterpreter(cliArgs);
-            //ParseTreeWalker.DEFAULT.walk(interpreter, ast);
-            interpreter.visitCompilationUnit(ast);
+            if (cliOptions.hasOption("js")) {
+                JsTranspiler transpiler = new JsTranspiler(cliOptions);
+                ParseTreeWalker.DEFAULT.walk(transpiler, ast);
+            } else {
+                ArrobaInterpreter interpreter = new ArrobaInterpreter(cliArgs);
+                interpreter.visitCompilationUnit(ast);
+            }
         }
     }
 
@@ -47,6 +53,7 @@ public class Main {
         result.addOption("d", "debug", false, "Enable debug output.");
         result.addOption("i", "in", true, "The input file to be parsed.");
         result.addOption("a", "repl", false, "Starts the Arroba REPL.");
+        result.addOption("js", "javascript", false, "Enables JavaScript output.");
         return result;
     }
 
