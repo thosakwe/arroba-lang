@@ -1,11 +1,14 @@
 # arroba-lang
 
-That really cool language, yeah.
+That really cool language, yeah. Now entering version 2 development.
 
     "Hello, world!" -> print
 
 # Documentation
 [Click here.](doc/index.md)
+
+# Proposed New Features
+[Click here.](changes2.md)
 
 # About
 
