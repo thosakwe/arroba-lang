@@ -15,6 +15,14 @@
 * Compile to JVM
 * Extend and interface with Arroba compiler via Java
 
+# Package
+Interpreter, analyzer, and compiler will extend from a class called Package. This class will be exposed for interop with `extern` libraries, which will allow for the use of them in the interpreter.
+
+This final package is a conglomeration of all available assets.
+
+# Pipeline
+Somewhat similar to Barback for Dart, Arroba will have multiple operations applied to its AST. Before being finally compiled to JVM or interpreted, etc., assets will be available for transformation via a Pipeline construct, which will also expose the underlying Package. This will enable a great deal of extensibility for Arroba, and make things like retargeting to other platforms possible...
+
 # New Language Features
 
 ## Metadata
